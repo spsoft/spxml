@@ -11,6 +11,10 @@ LINKER = $(CC)
 LINT = lint -c
 RM = /bin/rm -f
 
+ifeq ($(origin version), undefined)
+	version = 0.1
+endif
+
 #--------------------------------------------------------------------
 
 LIBOBJS = spxmlutils.o spxmlevent.o spxmlreader.o spxmlparser.o spxmlstag.o \
@@ -32,8 +36,16 @@ testpull: testpull.o
 testdom: testdom.o
 	$(LINKER) $(LDFLAGS) $^ -L. -lspxml -o $@
 
+dist: clean spxml-$(version).src.tar.gz
+
+spxml-$(version).src.tar.gz:
+	@ls | sed s:^:spxml-$(version)/: > MANIFEST
+	@(cd ..; ln -s spxml spxml-$(version))
+	(cd ..; tar -czvf spxml/spxml-$(version).src.tar.gz `cat spxml/MANIFEST`)
+	@(cd ..; rm spxml-$(version))
+
 clean:
-	$(RM) *.o vgcore.* core core.* $(TARGET)
+	@( $(RM) *.o vgcore.* core core.* $(TARGET) )
 
 #--------------------------------------------------------------------
 
