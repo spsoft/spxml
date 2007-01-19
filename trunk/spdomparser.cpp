@@ -31,8 +31,15 @@ SP_XmlDomParser :: ~SP_XmlDomParser()
 
 void SP_XmlDomParser :: append( const char * source, int len )
 {
-	mParser->append( source, len );
+	for( int pos = 0; pos < len; pos += 64 ) {
+		int realLen = ( len - pos ) > 64 ? 64 : ( len - pos );
+		mParser->append( source + pos, realLen );
+		buildTree();
+	}
+}
 
+void SP_XmlDomParser :: buildTree()
+{
 	for( SP_XmlPullEvent * event = mParser->getNext();
 			NULL != event; event = mParser->getNext() ) {
 

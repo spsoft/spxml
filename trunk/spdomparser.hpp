@@ -31,6 +31,8 @@ public:
 	const SP_XmlDocument * getDocument() const;
 
 private:
+	void buildTree();
+
 	SP_XmlDomParser( SP_XmlDomParser & );
 	SP_XmlDomParser & operator=( SP_XmlDomParser & );
 
