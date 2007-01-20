@@ -114,9 +114,9 @@ void SP_XmlStartTagReader :: read( SP_XmlPullParser * parser, char c )
 		changeReader( parser, getReader( parser, SP_XmlReader::eCData ) );
 	} else if( '/' == c && 0 == mIsQuot ) {
 		SP_XmlReader * reader = getReader( parser, SP_XmlReader::eETag );
-		const char * end = strchr( mBuffer->getBuffer(), ' ' );
-		if( NULL == end ) end = strchr( mBuffer->getBuffer(), '\0' );
-		for( const char * pos = mBuffer->getBuffer(); pos < end; pos++ ) {
+		const char * pos = mBuffer->getBuffer();
+		for( ; isspace( *pos ); ) pos++;
+		for( ; 0 == isspace( *pos ) && '\0' != *pos; pos++ ) {
 			reader->read( parser, *pos );
 		}
 		changeReader( parser, reader );
