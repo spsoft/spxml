@@ -31,6 +31,23 @@ private:
 	SP_XmlArrayListNode_t * mFirst;
 };
 
+class SP_XmlQueue {
+public:
+	SP_XmlQueue();
+	virtual ~SP_XmlQueue();
+
+	void push( void * item );
+	void * pop();
+	void * top();
+
+private:
+	void ** mEntries;
+	unsigned int mHead;
+	unsigned int mTail;
+	unsigned int mCount;
+	unsigned int mMaxCount;
+};
+
 class SP_XmlStringBuffer {
 public:
 	SP_XmlStringBuffer();

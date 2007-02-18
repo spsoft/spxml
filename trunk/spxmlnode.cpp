@@ -116,6 +116,7 @@ SP_XmlDocument :: ~SP_XmlDocument()
 
 void SP_XmlDocument :: setDocDecl( SP_XmlDocDeclNode * docDecl )
 {
+	if( NULL != mDocDecl ) delete mDocDecl;
 	docDecl->setParent( this );
 	mDocDecl = docDecl;
 }
@@ -127,6 +128,7 @@ SP_XmlDocDeclNode * SP_XmlDocument :: getDocDecl() const
 
 void SP_XmlDocument :: setDocType( SP_XmlDocTypeNode * docType )
 {
+	if( NULL != mDocType ) delete mDocType;
 	docType->setParent( this );
 	mDocType = docType;
 }
@@ -138,6 +140,7 @@ SP_XmlDocTypeNode * SP_XmlDocument :: getDocType() const
 
 void SP_XmlDocument :: setRootElement( SP_XmlElementNode * rootElement )
 {
+	if( NULL != mRootElement ) delete mRootElement;
 	rootElement->setParent( this );
 	mRootElement = rootElement;
 }

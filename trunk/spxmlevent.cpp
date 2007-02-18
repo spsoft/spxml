@@ -25,52 +25,28 @@ int SP_XmlPullEvent :: getEventType()
 
 //=========================================================
 
-SP_XmlPullEventList :: SP_XmlPullEventList()
+SP_XmlPullEventQueue :: SP_XmlPullEventQueue()
 {
-	mList = new SP_XmlArrayList();
+	mQueue = new SP_XmlQueue();
 }
 
-SP_XmlPullEventList :: ~SP_XmlPullEventList()
+SP_XmlPullEventQueue :: ~SP_XmlPullEventQueue()
 {
-	for( int i = 0; i < mList->getCount(); i++ ) {
-		SP_XmlPullEvent * event = NULL;
-		memcpy( &event, mList->getItem( i ), sizeof( void * ) );
-		delete event;
+	for( void * item = mQueue->pop(); NULL != item; item = mQueue->pop() ) {
+		delete (SP_XmlPullEvent*)item;
 	}
 
-	delete mList;
+	delete mQueue;
 }
 
-int SP_XmlPullEventList :: getCount() const
+void SP_XmlPullEventQueue :: enqueue( SP_XmlPullEvent * event )
 {
-	return mList->getCount();
+	mQueue->push( event );
 }
 
-void SP_XmlPullEventList :: append( SP_XmlPullEvent * event )
+SP_XmlPullEvent * SP_XmlPullEventQueue :: dequeue()
 {
-	mList->append( &event, sizeof( void * ) );
-}
-
-const SP_XmlPullEvent * SP_XmlPullEventList :: get( int index ) const
-{
-	SP_XmlPullEvent * event = NULL;
-	if( NULL != mList->getItem( index ) ) {
-		memcpy( &event, mList->getItem( index ), sizeof( void * ) );
-	}
-
-	return event;
-}
-
-SP_XmlPullEvent * SP_XmlPullEventList :: take( int index )
-{
-	SP_XmlPullEvent * event = NULL;
-
-	void * item = mList->takeItem( index );
-	if( NULL != item ) {
-		memcpy( &event, item, sizeof( void * ) );
-		free( item );
-	}
-
+	SP_XmlPullEvent * event = (SP_XmlPullEvent*)mQueue->pop();
 	return event;
 }
 

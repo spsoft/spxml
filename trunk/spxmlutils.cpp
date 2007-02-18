@@ -103,6 +103,71 @@ const void * SP_XmlArrayList :: getItem( int index, int * size ) const
 
 //=========================================================
 
+SP_XmlQueue :: SP_XmlQueue()
+{
+	mMaxCount = 8;
+	mEntries = (void**)malloc( sizeof( void * ) * mMaxCount );
+
+	mHead = mTail = mCount = 0;
+}
+
+SP_XmlQueue :: ~SP_XmlQueue()
+{
+	free( mEntries );
+	mEntries = NULL;
+}
+
+void SP_XmlQueue :: push( void * item )
+{
+	if( mCount >= mMaxCount ) {
+		mMaxCount = ( mMaxCount * 3 ) / 2 + 1;
+		void ** newEntries = (void**)malloc( sizeof( void * ) * mMaxCount );
+
+		unsigned int headLen = 0, tailLen = 0;
+		if( mHead < mTail ) {
+			headLen = mTail - mHead;
+		} else {
+			headLen = mCount - mTail;
+			tailLen = mTail;
+		}
+
+		memcpy( newEntries, &( mEntries[ mHead ] ), sizeof( void * ) * headLen );
+		if( tailLen ) {
+			memcpy( &( newEntries[ headLen ] ), mEntries, sizeof( void * ) * tailLen );
+		}
+
+		mHead = 0;
+		mTail = headLen + tailLen;
+
+		free( mEntries );
+		mEntries = newEntries;
+	}
+
+	mEntries[ mTail++ ] = item;
+	mTail = mTail % mMaxCount;
+	mCount++;
+}
+
+void * SP_XmlQueue :: pop()
+{
+	void * ret = NULL;
+
+	if( mCount > 0 ) {
+		ret = mEntries[ mHead++ ];
+		mHead = mHead % mMaxCount;
+		mCount--;
+	}
+
+	return ret;
+}
+
+void * SP_XmlQueue :: top()
+{
+	return mCount > 0 ? mEntries[ mHead ] : NULL;
+}
+
+//=========================================================
+
 SP_XmlStringBuffer :: SP_XmlStringBuffer()
 {
 	init();
