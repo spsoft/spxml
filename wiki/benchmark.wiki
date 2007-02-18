@@ -1,4 +1,4 @@
-#summary compare to expat.
+#summary compare spxml-0.2 to expat.
 #labels Phase-QA,Featured
 
 = Introduction =
