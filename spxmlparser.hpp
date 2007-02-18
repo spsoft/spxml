@@ -7,7 +7,7 @@
 #define __xmlparser_hpp__
 
 class SP_XmlPullEvent;
-class SP_XmlPullEventList;
+class SP_XmlPullEventQueue;
 class SP_XmlReader;
 class SP_XmlReaderPool;
 class SP_XmlArrayList;
@@ -40,7 +40,7 @@ protected:
 	friend class SP_XmlReader;
 
 private:
-	SP_XmlPullEventList * mEventList;
+	SP_XmlPullEventQueue * mEventQueue;
 	SP_XmlReader * mReader;
 	SP_XmlReaderPool * mReaderPool;
 	SP_XmlArrayList * mTagNameStack;

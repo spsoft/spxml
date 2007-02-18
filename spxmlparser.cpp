@@ -16,8 +16,8 @@ SP_XmlPullParser :: SP_XmlPullParser()
 {
 	mReaderPool = new SP_XmlReaderPool();
 	mReader = getReader( SP_XmlReader::eLBracket );
-	mEventList = new SP_XmlPullEventList();
-	mEventList->append( new SP_XmlStartDocEvent() );
+	mEventQueue = new SP_XmlPullEventQueue();
+	mEventQueue->enqueue( new SP_XmlStartDocEvent() );
 
 	mRootTagState = eRootNone;
 	mTagNameStack = new SP_XmlArrayList();
@@ -36,7 +36,7 @@ SP_XmlPullParser :: ~SP_XmlPullParser()
 
 	delete mTagNameStack;
 
-	delete mEventList;
+	delete mEventQueue;
 
 	delete mReaderPool;
 
@@ -63,7 +63,7 @@ void SP_XmlPullParser :: append( const char * source, int len )
 
 SP_XmlPullEvent * SP_XmlPullParser :: getNext()
 {
-	SP_XmlPullEvent * event = mEventList->take( 0 );
+	SP_XmlPullEvent * event = mEventQueue->dequeue();
 
 	if( NULL != event ) {
 		if( SP_XmlPullEvent::eStartTag == event->getEventType() ) mLevel++;
@@ -116,10 +116,10 @@ void SP_XmlPullParser :: changeReader( SP_XmlReader * reader )
 		}
 
 		if( NULL != event ) {
-			mEventList->append( event );
+			mEventQueue->enqueue( event );
 			if( mTagNameStack->getCount() <= 0 && eRootStart == mRootTagState ) {
 				mRootTagState = eRootEnd;
-				mEventList->append( new SP_XmlEndDocEvent() );
+				mEventQueue->enqueue( new SP_XmlEndDocEvent() );
 			}
 		}
 	}

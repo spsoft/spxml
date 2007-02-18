@@ -7,6 +7,7 @@
 #define __spxmlevent_hpp__
 
 class SP_XmlArrayList;
+class SP_XmlQueue;
 
 class SP_XmlPullEvent {
 public:
@@ -28,21 +29,19 @@ protected:
 	const int mEventType;
 };
 
-class SP_XmlPullEventList {
+class SP_XmlPullEventQueue {
 public:
-	SP_XmlPullEventList();
-	~SP_XmlPullEventList();
+	SP_XmlPullEventQueue();
+	~SP_XmlPullEventQueue();
 
-	int getCount() const;
-	void append( SP_XmlPullEvent * event );
-	const SP_XmlPullEvent * get( int index ) const;
-	SP_XmlPullEvent * take( int index );
+	void enqueue( SP_XmlPullEvent * event );
+	SP_XmlPullEvent * dequeue();
 
 private:
-	SP_XmlPullEventList( SP_XmlPullEventList & );
-	SP_XmlPullEventList & operator=( SP_XmlPullEventList & );
+	SP_XmlPullEventQueue( SP_XmlPullEventQueue & );
+	SP_XmlPullEventQueue & operator=( SP_XmlPullEventQueue & );
 
-	SP_XmlArrayList * mList;
+	SP_XmlQueue * mQueue;
 };
 
 class SP_XmlStartDocEvent : public SP_XmlPullEvent {
