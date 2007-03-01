@@ -48,8 +48,7 @@ SP_XmlNodeList :: SP_XmlNodeList()
 SP_XmlNodeList :: ~SP_XmlNodeList()
 {
 	for( int i = 0; i < mList->getCount(); i++ ) {
-		SP_XmlNode * node = NULL;
-		memcpy( &node, mList->getItem( i ), sizeof( void * ) );
+		SP_XmlNode * node = (SP_XmlNode*)mList->getItem( i );
 		delete node;
 	}
 
@@ -65,31 +64,17 @@ int SP_XmlNodeList :: getLength() const
 
 void SP_XmlNodeList :: append( SP_XmlNode * node )
 {
-	mList->append( &node, sizeof( void * ) );
+	mList->append( node );
 }
 
 const SP_XmlNode * SP_XmlNodeList :: get( int index ) const
 {
-	SP_XmlNode * node = NULL;
-
-	if( NULL != mList->getItem( index ) ) {
-		memcpy( &node, mList->getItem( index ), sizeof( void * ) );
-	}
-
-	return node;
+	return (SP_XmlNode*)mList->getItem( index );
 }
 
 const SP_XmlNode * SP_XmlNodeList :: take( int index ) const
 {
-	SP_XmlNode * node = NULL;
-
-	void * item = mList->takeItem( index );
-	if( NULL != item ) {
-		memcpy( &node, item, sizeof( void * ) );
-		free( item );
-	}
-
-	return node;
+	return (SP_XmlNode*)mList->takeItem( index );
 }
 
 //=========================================================

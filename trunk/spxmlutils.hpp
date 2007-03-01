@@ -18,9 +18,9 @@ public:
 	virtual ~SP_XmlArrayList();
 
 	int getCount() const;
-	int append( const void * value, int size );
-	const void * getItem( int index, int * size = NULL ) const;
-	void * takeItem( int index, int * size = NULL );
+	int append( void * value );
+	const void * getItem( int index ) const;
+	void * takeItem( int index );
 
 private:
 	SP_XmlArrayList( SP_XmlArrayList & );
@@ -28,7 +28,7 @@ private:
 
 	int mMaxCount;
 	int mCount;
-	SP_XmlArrayListNode_t * mFirst;
+	void ** mFirst;
 };
 
 class SP_XmlQueue {

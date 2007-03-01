@@ -14,27 +14,19 @@
 
 //=========================================================
 
-typedef struct tagSP_XmlArrayListNode {
-	void * mBuffer;
-	int mSize;
-} SP_XmlArrayListNode_t;
-
 const int SP_XmlArrayList::LAST_INDEX = -1;
 
 SP_XmlArrayList :: SP_XmlArrayList( int initCount )
 {
 	mMaxCount = initCount <= 0 ? 2 : initCount;
 	mCount = 0;
-	mFirst = (SP_XmlArrayListNode_t*)malloc(
-		sizeof( SP_XmlArrayListNode_t ) * mMaxCount );
+	mFirst = (void**)malloc( sizeof( void * ) * mMaxCount );
 }
 
 SP_XmlArrayList :: ~SP_XmlArrayList()
 {
-	for( int i = 0; i < mCount; i++ ) {
-		free( mFirst[ i ].mBuffer );
-	}
 	free( mFirst );
+	mFirst = NULL;
 }
 
 int SP_XmlArrayList :: getCount() const
@@ -42,61 +34,51 @@ int SP_XmlArrayList :: getCount() const
 	return mCount;
 }
 
-int SP_XmlArrayList :: append( const void * value, int size )
+int SP_XmlArrayList :: append( void * value )
 {
-	if( NULL == value || size < 0 ) return -1;
+	if( NULL == value ) return -1;
 
 	if( mCount >= mMaxCount ) {
 		mMaxCount = ( mMaxCount * 3 ) / 2 + 1;
-		mFirst = (SP_XmlArrayListNode_t*)realloc(
-			mFirst, mMaxCount * sizeof( SP_XmlArrayListNode_t ) );
+		mFirst = (void**)realloc( mFirst, sizeof( void * ) * mMaxCount );
 		assert( NULL != mFirst );
-		memset( mFirst + mCount, 0,
-			( mMaxCount - mCount ) * sizeof( SP_XmlArrayListNode_t ) );
+		memset( mFirst + mCount, 0, ( mMaxCount - mCount ) * sizeof( void * ) );
 	}
 
-	SP_XmlArrayListNode_t * newNode = &( mFirst[ mCount++ ]);
-	newNode->mSize = size;
-	newNode->mBuffer = malloc( size + 1 );
-	memcpy( newNode->mBuffer, value, size );
-	((char*)newNode->mBuffer)[ size ] = '\0';
+	mFirst[ mCount++ ] = value;
 
 	return 0;
 }
 
-void * SP_XmlArrayList :: takeItem( int index, int * size )
+void * SP_XmlArrayList :: takeItem( int index )
 {
 	void * ret = NULL;
 
 	if( LAST_INDEX == index ) index = mCount -1;
 	if( index < 0 || index >= mCount ) return ret;
 
-	SP_XmlArrayListNode_t * destNode = &( mFirst[ index ] );
-	ret = destNode->mBuffer;
-	if( NULL != size ) *size = destNode->mSize;
+	ret = mFirst[ index ];
 
 	mCount--;
 
 	if( ( index + 1 ) < mMaxCount ) {
-		memmove( destNode, destNode + 1,
-			( mMaxCount - index - 1 ) * sizeof( SP_XmlArrayListNode_t ) );
+		memmove( mFirst + index, mFirst + index + 1,
+			( mMaxCount - index - 1 ) * sizeof( void * ) );
 	} else {
-		memset( destNode, 0, sizeof( SP_XmlArrayListNode_t ) );
+		mFirst[ index ] = NULL;
 	}
 
 	return ret;
 }
 
-const void * SP_XmlArrayList :: getItem( int index, int * size ) const
+const void * SP_XmlArrayList :: getItem( int index ) const
 {
 	const void * ret = NULL;
 
 	if( LAST_INDEX == index ) index = mCount - 1;
 	if( index < 0 || index >= mCount ) return ret;
 
-	SP_XmlArrayListNode_t * destNode = &( mFirst[ index ] );
-	ret = destNode->mBuffer;
-	if( NULL != size ) *size = destNode->mSize;
+	ret = mFirst[ index ];
 
 	return ret;
 }
