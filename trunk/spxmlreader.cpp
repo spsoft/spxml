@@ -60,7 +60,7 @@ SP_XmlDocDeclReader :: ~SP_XmlDocDeclReader()
 void SP_XmlDocDeclReader :: read( SP_XmlPullParser * parser, char c )
 {
 	if( '>' == c ) {
-		changeReader( parser, getReader( parser, SP_XmlReader::eCData ) );
+		changeReader( parser, getReader( parser, SP_XmlReader::ePCData ) );
 	} else {
 		mBuffer->append( c );
 	}
@@ -85,8 +85,12 @@ SP_XmlPullEvent * SP_XmlDocDeclReader :: getEvent( SP_XmlPullParser * parser )
 		retEvent = new SP_XmlDocDeclEvent();
 		retEvent->setVersion( NULL == version ? "" : version );
 		retEvent->setEncoding( NULL == encoding ? "" : encoding );
-		if( NULL != standalone && 0 == strcasecmp( "no", standalone ) ) {
-			retEvent->setStandalone( 0 );
+		if( NULL != standalone ) {
+			if( 0 == strcasecmp( "no", standalone ) ) {
+				retEvent->setStandalone( 0 );
+			} else {
+				retEvent->setStandalone( 1 );
+			}
 		}
 
 		delete event;
@@ -111,7 +115,7 @@ SP_XmlStartTagReader :: ~SP_XmlStartTagReader()
 void SP_XmlStartTagReader :: read( SP_XmlPullParser * parser, char c )
 {
 	if( '>' == c && 0 == mIsQuot ) {
-		changeReader( parser, getReader( parser, SP_XmlReader::eCData ) );
+		changeReader( parser, getReader( parser, SP_XmlReader::ePCData ) );
 	} else if( '/' == c && 0 == mIsQuot ) {
 		SP_XmlReader * reader = getReader( parser, SP_XmlReader::eETag );
 		const char * pos = mBuffer->getBuffer();
@@ -120,9 +124,18 @@ void SP_XmlStartTagReader :: read( SP_XmlPullParser * parser, char c )
 			reader->read( parser, *pos );
 		}
 		changeReader( parser, reader );
+	} else if( '<' == c && 0 == mIsQuot ) {
+		setError( parser, "illegal char" );
 	} else {
 		mBuffer->append( c );
-		if( '"' == c || '\'' == c ) mIsQuot = ( mIsQuot + 1 ) % 2;
+
+		if( 0 == mIsQuot ) {
+			if( '\'' == c ) mIsQuot = 1;
+			if( '"' == c ) mIsQuot = 2;
+		} else {
+			if( 1 == mIsQuot && '\'' == c ) mIsQuot = 0;
+			if( 2 == mIsQuot && '"' == c ) mIsQuot = 0;
+		}
 	}
 }
 
@@ -162,7 +175,9 @@ SP_XmlEndTagReader :: ~SP_XmlEndTagReader()
 void SP_XmlEndTagReader :: read( SP_XmlPullParser * parser,	char c )
 {
 	if( '>' == c ) {
-		changeReader( parser, getReader( parser, SP_XmlReader::eCData ) );
+		changeReader( parser, getReader( parser, SP_XmlReader::ePCData ) );
+	} else if( '/' == c ) {
+		setError( parser, "illegal name char" );
 	} else {
 		mBuffer->append( c );
 	}
@@ -170,23 +185,27 @@ void SP_XmlEndTagReader :: read( SP_XmlPullParser * parser,	char c )
 
 SP_XmlPullEvent * SP_XmlEndTagReader :: getEvent( SP_XmlPullParser * parser )
 {
+	const char * end = mBuffer->getBuffer() + mBuffer->getSize() - 1;
+
+	for( ; end > mBuffer->getBuffer() && isspace( *end ); ) end--;
+
 	SP_XmlEndTagEvent * retEvent = new SP_XmlEndTagEvent();
-	retEvent->setText( mBuffer->getBuffer(), mBuffer->getSize() );
+	retEvent->setText( mBuffer->getBuffer(), end - mBuffer->getBuffer() + 1 );
 
 	return retEvent;
 }
 
 //=========================================================
 
-SP_XmlCDataReader :: SP_XmlCDataReader()
+SP_XmlPCDataReader :: SP_XmlPCDataReader()
 {
 }
 
-SP_XmlCDataReader :: ~SP_XmlCDataReader()
+SP_XmlPCDataReader :: ~SP_XmlPCDataReader()
 {
 }
 
-void SP_XmlCDataReader :: read( SP_XmlPullParser * parser, char c )
+void SP_XmlPCDataReader :: read( SP_XmlPullParser * parser, char c )
 {
 	if( '<' == c ) {
 		SP_XmlReader * reader = getReader( parser, SP_XmlReader::eLBracket );
@@ -197,7 +216,7 @@ void SP_XmlCDataReader :: read( SP_XmlPullParser * parser, char c )
 	}
 }
 
-SP_XmlPullEvent * SP_XmlCDataReader :: getEvent( SP_XmlPullParser * parser )
+SP_XmlPullEvent * SP_XmlPCDataReader :: getEvent( SP_XmlPullParser * parser )
 {
 	SP_XmlCDataEvent * retEvent = NULL;
 
@@ -221,6 +240,59 @@ SP_XmlPullEvent * SP_XmlCDataReader :: getEvent( SP_XmlPullParser * parser )
 
 //=========================================================
 
+SP_XmlCDataSectionReader :: SP_XmlCDataSectionReader()
+{
+}
+
+SP_XmlCDataSectionReader :: ~SP_XmlCDataSectionReader()
+{
+}
+
+void SP_XmlCDataSectionReader :: read( SP_XmlPullParser * parser, char c )
+{
+	if( '>' == c && mBuffer->getSize() > 2 ) {
+		char last1 = mBuffer->getBuffer()[ mBuffer->getSize() - 1 ];
+		char last2 = mBuffer->getBuffer()[ mBuffer->getSize() - 2 ];
+
+		if( ']' == last1 && ']' == last2 ) {
+			changeReader( parser, getReader( parser, SP_XmlReader::ePCData ) );
+		} else {
+			mBuffer->append( c );
+		}
+	} else {
+		mBuffer->append( c );
+	}
+}
+
+SP_XmlPullEvent * SP_XmlCDataSectionReader :: getEvent( SP_XmlPullParser * parser )
+{
+	SP_XmlCDataEvent * retEvent = NULL;
+
+	int len = mBuffer->getSize();
+	const char * data = mBuffer->getBuffer();
+	if( 0 == strcmp( data, "CDATA[" ) ) {
+		data += strlen( "CDATA[" );
+		len -= strlen( "CDATA[" );
+	}
+
+	int ignoreWhitespace = 1;
+	for( int i = 0; i < len - 2; i++ ) {
+		if( !isspace( data[i] ) ) {
+			ignoreWhitespace = 0;
+			break;
+		}
+	}
+
+	if( 0 == ignoreWhitespace ) {
+		retEvent = new SP_XmlCDataEvent();
+		retEvent->setText( data, len - 2 );
+	}
+
+	return retEvent;
+}
+
+//=========================================================
+
 SP_XmlCommentReader :: SP_XmlCommentReader()
 {
 }
@@ -235,7 +307,7 @@ void SP_XmlCommentReader :: read( SP_XmlPullParser * parser, char c )
 		int size = mBuffer->getSize();
 		if( '-' == mBuffer->getBuffer()[ size - 1 ]
 				&& '-' == mBuffer->getBuffer()[ size - 2 ] ) {
-			changeReader( parser, getReader( parser, SP_XmlReader::eCData ) );
+			changeReader( parser, getReader( parser, SP_XmlReader::ePCData ) );
 		} else {
 			mBuffer->append( c );
 		}
@@ -266,7 +338,16 @@ SP_XmlDocTypeReader :: ~SP_XmlDocTypeReader()
 void SP_XmlDocTypeReader :: read( SP_XmlPullParser * parser, char c )
 {
 	if( '>' == c ) {
-		changeReader( parser, getReader( parser, SP_XmlReader::eCData ) );
+		if( NULL != strchr( mBuffer->getBuffer(), '[' ) ) {
+			char last = mBuffer->getBuffer()[ mBuffer->getSize() - 1 ];
+			if( ']' == last ) {
+				changeReader( parser, getReader( parser, SP_XmlReader::ePCData ) );
+			} else {
+				mBuffer->append( c );
+			}
+		} else {
+			changeReader( parser, getReader( parser, SP_XmlReader::ePCData ) );
+		}
 	} else {
 		mBuffer->append( c );
 	}
@@ -304,7 +385,7 @@ SP_XmlPullEvent * SP_XmlDocTypeReader :: getEvent( SP_XmlPullParser * parser )
 
 		delete event;
 	} else {
-		setError( parser, tagParser.getError() );
+		//setError( parser, tagParser.getError() );
 	}
 
 	return retEvent;
@@ -370,7 +451,7 @@ SP_XmlSignReader :: ~SP_XmlSignReader()
 void SP_XmlSignReader :: read( SP_XmlPullParser * parser, char c )
 {
 	if( '[' == c ) {
-		changeReader( parser, getReader( parser, SP_XmlReader::eCData ) );
+		changeReader( parser, getReader( parser, SP_XmlReader::eCDataSection ) );
 	} else if( '-' == c ) {
 		changeReader( parser, getReader( parser, SP_XmlReader::eComment ) );
 	} else if( isupper( c ) ) {
@@ -416,7 +497,8 @@ SP_XmlReader * SP_XmlReaderPool :: borrow( int type )
 			case SP_XmlReader::eDocDecl: reader = new SP_XmlDocDeclReader(); break;
 			case SP_XmlReader::eSTag: reader = new SP_XmlStartTagReader(); break;
 			case SP_XmlReader::eETag: reader = new SP_XmlEndTagReader(); break;
-			case SP_XmlReader::eCData: reader = new SP_XmlCDataReader(); break;
+			case SP_XmlReader::ePCData: reader = new SP_XmlPCDataReader(); break;
+			case SP_XmlReader::eCDataSection: reader = new SP_XmlCDataSectionReader(); break;
 			case SP_XmlReader::eComment: reader = new SP_XmlCommentReader(); break;
 			case SP_XmlReader::eDocType: reader = new SP_XmlDocTypeReader(); break;
 			case SP_XmlReader::eLBracket: reader = new SP_XmlLeftBracketReader(); break;

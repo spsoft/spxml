@@ -13,7 +13,8 @@ class SP_XmlStringBuffer;
 class SP_XmlReader {
 public:
 	enum { MAX_READER = 16 };
-	enum { eDocDecl, eDocType, eSTag, eETag, eCData, eComment, eLBracket, eSign };
+	enum { eDocDecl, eDocType, eSTag, eETag, ePCData,
+		eCDataSection, eComment, eLBracket, eSign };
 
 	/**
 	 * @param  parser : act as reader's context
@@ -82,10 +83,18 @@ public:
 	virtual SP_XmlPullEvent * getEvent( SP_XmlPullParser * parser );
 };
 
-class SP_XmlCDataReader : public SP_XmlReader {
+class SP_XmlPCDataReader : public SP_XmlReader {
 public:
-	SP_XmlCDataReader();
-	virtual ~SP_XmlCDataReader();
+	SP_XmlPCDataReader();
+	virtual ~SP_XmlPCDataReader();
+	virtual void read( SP_XmlPullParser * parser, char c );
+	virtual SP_XmlPullEvent * getEvent( SP_XmlPullParser * parser );
+};
+
+class SP_XmlCDataSectionReader : public SP_XmlReader {
+public:
+	SP_XmlCDataSectionReader();
+	virtual ~SP_XmlCDataSectionReader();
 	virtual void read( SP_XmlPullParser * parser, char c );
 	virtual SP_XmlPullEvent * getEvent( SP_XmlPullParser * parser );
 };
