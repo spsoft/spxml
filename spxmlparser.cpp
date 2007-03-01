@@ -34,6 +34,9 @@ SP_XmlPullParser :: ~SP_XmlPullParser()
 {
 	mReaderPool->save( mReader );
 
+	for( int i = 0; i < mTagNameStack->getCount(); i++ ) {
+		free( (char*)mTagNameStack->getItem( i ) );
+	}
 	delete mTagNameStack;
 
 	delete mEventQueue;
@@ -90,7 +93,7 @@ void SP_XmlPullParser :: changeReader( SP_XmlReader * reader )
 		if( SP_XmlPullEvent::eStartTag == event->getEventType() ) {
 			if( eRootNone == mRootTagState ) mRootTagState = eRootStart;
 			const char * name = ((SP_XmlStartTagEvent*)event)->getName();
-			mTagNameStack->append( name, strlen( name ) + 1 );
+			mTagNameStack->append( strdup( name ) );
 		}
 		if( SP_XmlPullEvent::eEndTag == event->getEventType() ) {
 			char error[ 256 ] = { 0 };

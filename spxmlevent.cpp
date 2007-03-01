@@ -186,9 +186,16 @@ SP_XmlStartTagEvent :: ~SP_XmlStartTagEvent()
 	if( NULL != mName ) free( mName );
 	mName = NULL;
 
+	for( int i = 0; i < mAttrNameList->getCount(); i++ ) {
+		free( (char*)mAttrNameList->getItem( i ) );
+	}
+
 	delete mAttrNameList;
 	mAttrNameList = NULL;
 
+	for( int i = 0; i < mAttrValueList->getCount(); i++ ) {
+		free( (char*)mAttrValueList->getItem( i ) );
+	}
 	delete mAttrValueList;
 	mAttrValueList = NULL;
 }
@@ -208,8 +215,8 @@ const char * SP_XmlStartTagEvent :: getName() const
 
 void SP_XmlStartTagEvent :: addAttr( const char * name, const char * value )
 {
-	if( NULL != name ) mAttrNameList->append( name, strlen( name ) );
-	if( NULL != value ) mAttrValueList->append( value, strlen( value ) );
+	if( NULL != name ) mAttrNameList->append( strdup( name ) );
+	if( NULL != value ) mAttrValueList->append( strdup( value ) );
 }
 
 const char * SP_XmlStartTagEvent :: getAttrValue( const char * name ) const
