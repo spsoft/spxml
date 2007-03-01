@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <typeinfo>
 
 #include "spxmlparser.hpp"
 #include "spxmlreader.hpp"
@@ -126,6 +127,8 @@ void SP_XmlPullParser :: changeReader( SP_XmlReader * reader )
 			}
 		}
 	}
+
+	//printf( "\nchange: %s -> %s\n", typeid( *mReader ).name(), typeid( *reader ).name() );
 
 	mReaderPool->save( mReader );
 	mReader = reader;
