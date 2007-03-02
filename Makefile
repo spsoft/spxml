@@ -21,7 +21,7 @@ LIBOBJS = spxmlutils.o spxmlevent.o spxmlreader.o spxmlparser.o spxmlstag.o \
 		spxmlnode.o spdomparser.o spdomiterator.o
 
 TARGET =  libspxml.so \
-		testpull testdom
+		testpull testdom testxmlconf
 
 #--------------------------------------------------------------------
 
@@ -34,6 +34,9 @@ testpull: testpull.o
 	$(LINKER) $(LDFLAGS) $^ -L. -lspxml -o $@
 
 testdom: testdom.o
+	$(LINKER) $(LDFLAGS) $^ -L. -lspxml -o $@
+
+testxmlconf: testxmlconf.o spcanonxml.o
 	$(LINKER) $(LDFLAGS) $^ -L. -lspxml -o $@
 
 dist: clean spxml-$(version).src.tar.gz

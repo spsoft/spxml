@@ -24,6 +24,8 @@ SP_XmlPullParser :: SP_XmlPullParser()
 	mTagNameStack = new SP_XmlArrayList();
 	mLevel = 0;
 
+	mIgnoreWhitespace = 1;
+
 	mError = NULL;
 
 	memset( mErrorSegment, 0, sizeof( mErrorSegment ) );
@@ -80,6 +82,16 @@ SP_XmlPullEvent * SP_XmlPullParser :: getNext()
 int SP_XmlPullParser :: getLevel()
 {
 	return mLevel;
+}
+
+void SP_XmlPullParser :: setIgnoreWhitespace( int ignoreWhitespace )
+{
+	mIgnoreWhitespace = ignoreWhitespace;
+}
+
+int SP_XmlPullParser :: getIgnoreWhitespace()
+{
+	return mIgnoreWhitespace;
 }
 
 const char * SP_XmlPullParser :: getError()

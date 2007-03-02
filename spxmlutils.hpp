@@ -21,6 +21,7 @@ public:
 	int append( void * value );
 	const void * getItem( int index ) const;
 	void * takeItem( int index );
+	void sort( int ( * cmpFunc )( const void *, const void * ) );
 
 private:
 	SP_XmlArrayList( SP_XmlArrayList & );

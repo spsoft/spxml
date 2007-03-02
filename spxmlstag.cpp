@@ -107,7 +107,10 @@ void SP_XmlSTagReader :: addAttrName( SP_XmlSTagParser * parser, const char * na
 
 void SP_XmlSTagReader :: addAttrValue( SP_XmlSTagParser * parser, const char * value )
 {
-	parser->mEvent->addAttr( parser->mStartTagName->getBuffer(), value );
+	SP_XmlStringBuffer decodeValue;
+	SP_XmlStringUtils::decode( value, &decodeValue );
+
+	parser->mEvent->addAttr( parser->mStartTagName->getBuffer(), decodeValue.getBuffer() );
 	parser->mStartTagName->clean();
 }
 

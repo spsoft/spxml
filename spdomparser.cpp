@@ -29,6 +29,16 @@ SP_XmlDomParser :: ~SP_XmlDomParser()
 	mParser = NULL;
 }
 
+void SP_XmlDomParser :: setIgnoreWhitespace( int ignoreWhitespace )
+{
+	mParser->setIgnoreWhitespace( ignoreWhitespace );
+}
+
+int SP_XmlDomParser :: getIgnoreWhitespace()
+{
+	return mParser->getIgnoreWhitespace();
+}
+
 void SP_XmlDomParser :: append( const char * source, int len )
 {
 	for( int pos = 0; pos < len; pos += 64 ) {
@@ -128,10 +138,10 @@ const SP_XmlDocument * SP_XmlDomParser :: getDocument() const
 
 //=========================================================
 
-SP_XmlDomBuffer :: SP_XmlDomBuffer( const SP_XmlNode * node )
+SP_XmlDomBuffer :: SP_XmlDomBuffer( const SP_XmlNode * node, int indent )
 {
 	mBuffer = new SP_XmlStringBuffer();
-	dump( node, mBuffer, 0 );
+	dump( node, mBuffer, indent ? 0 : -1 );
 }
 
 SP_XmlDomBuffer :: ~SP_XmlDomBuffer()
@@ -155,32 +165,39 @@ void SP_XmlDomBuffer :: dump(
 {
 	if( SP_XmlNode::eXMLDOC == node->getType() ) {
 		SP_XmlDocument * document = static_cast<SP_XmlDocument*>((SP_XmlNode*)node);
-		dumpDocDecl( document->getDocDecl(), buffer );
-		dumpDocType( document->getDocType(), buffer );
+		dumpDocDecl( document->getDocDecl(), buffer, level );
+		dumpDocType( document->getDocType(), buffer, level );
 		dumpElement( document->getRootElement(), buffer, level );
 	} else if( SP_XmlNode::eCDATA == node->getType() ) {
 		SP_XmlCDataNode * cdata = static_cast<SP_XmlCDataNode*>((SP_XmlNode*)node);
 		SP_XmlStringUtils::encode( cdata->getText(), buffer );
 	} else if( SP_XmlNode::eCOMMENT == node->getType() ) {
 		SP_XmlCommentNode * comment = static_cast<SP_XmlCommentNode*>((SP_XmlNode*)node);
-		buffer->append( '\n' );
-		for( int i = 0; i < level; i++ ) buffer->append( '\t' );
-		buffer->append( "<!--" );
-		buffer->append( comment->getText() );
-		buffer->append( "-->\n" );
+
+		if( level >= 0 ) {
+			buffer->append( '\n' );
+			for( int i = 0; i < level; i++ ) buffer->append( '\t' );
+			buffer->append( "<!--" );
+			buffer->append( comment->getText() );
+			buffer->append( "-->\n" );
+		} else {
+			buffer->append( "<!--" );
+			buffer->append( comment->getText() );
+			buffer->append( "-->" );
+		}
 	} else if( SP_XmlNode::eELEMENT == node->getType() ) {
 		dumpElement( node, buffer, level );
 	} else if( SP_XmlNode::eDOCDECL == node->getType() ) {
-		dumpDocDecl( (SP_XmlDocDeclNode*)node, buffer );
+		dumpDocDecl( (SP_XmlDocDeclNode*)node, buffer, level );
 	} else if( SP_XmlNode::eDOCTYPE == node->getType() ) {
-		dumpDocType( (SP_XmlDocTypeNode*)node, buffer );
+		dumpDocType( (SP_XmlDocTypeNode*)node, buffer, level );
 	} else {
 		// ignore
 	}
 }
 
 void SP_XmlDomBuffer :: dumpDocDecl( const SP_XmlDocDeclNode * docDecl,
-		SP_XmlStringBuffer * buffer )
+		SP_XmlStringBuffer * buffer, int level )
 {
 	if( NULL == docDecl ) return;
 
@@ -205,11 +222,11 @@ void SP_XmlDomBuffer :: dumpDocDecl( const SP_XmlDocDeclNode * docDecl,
 		buffer->append( standalone );
 	}
 
-	buffer->append( "?>\n" );
+	buffer->append( level >= 0 ? "?>\n" : "?>" );
 }
 
 void SP_XmlDomBuffer :: dumpDocType( const SP_XmlDocTypeNode * docType,
-		SP_XmlStringBuffer * buffer )
+		SP_XmlStringBuffer * buffer, int level )
 {
 	if( NULL == docType ) return;
 
@@ -236,7 +253,7 @@ void SP_XmlDomBuffer :: dumpDocType( const SP_XmlDocTypeNode * docType,
 		buffer->append( '"' );
 	}
 
-	buffer->append( ">\n" );
+	buffer->append( level >= 0 ? ">\n" : ">" );
 }
 
 void SP_XmlDomBuffer :: dumpElement(
@@ -265,13 +282,13 @@ void SP_XmlDomBuffer :: dumpElement(
 
 		if( children->getLength() > 0 ) {
 			if( SP_XmlNode::eCDATA != children->get( 0 )->getType() ) {
-				buffer->append( ">\n" );
+				buffer->append( level >= 0 ? ">\n" : ">" );
 			} else {
 				buffer->append( ">" );
 			}
 
 			for( int j = 0; j < children->getLength(); j++ ) {
-				dump( children->get( j ), buffer, level + 1 );
+				dump( children->get( j ), buffer, level >= 0 ? level + 1 : -1 );
 			}
 
 			if( SP_XmlNode::eCDATA != children->get( 0 )->getType() ) {
@@ -279,9 +296,9 @@ void SP_XmlDomBuffer :: dumpElement(
 			}
 			buffer->append( "</" );
 			buffer->append( element->getName() );
-			buffer->append( ">\n" );
+			buffer->append( level >= 0 ? ">\n" : ">" );
 		} else {
-			buffer->append( "/>\n" );
+			buffer->append( level >= 0 ? "/>\n" : ">" );
 		}
 	} else {
 		dump( node, buffer, level );

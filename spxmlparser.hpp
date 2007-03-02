@@ -30,6 +30,11 @@ public:
 
 	int getLevel();
 
+	/// default ignoreWhitespace is true
+	void setIgnoreWhitespace( int ignoreWhitespace );
+
+	int getIgnoreWhitespace();
+
 protected:
 	void changeReader( SP_XmlReader * reader );
 
@@ -49,6 +54,8 @@ private:
 	int mRootTagState;
 
 	int mLevel;
+
+	int mIgnoreWhitespace;
 
 	char * mError;
 
