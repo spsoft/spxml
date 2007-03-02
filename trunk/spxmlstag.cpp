@@ -87,12 +87,12 @@ void SP_XmlSTagReader :: changeReader( SP_XmlSTagParser * parser,
 		SP_XmlSTagReader * reader )
 {
 	//printf( "\nchange: %s\n", typeid( *reader ).name() );
-	return parser->changeReader( reader );
+	parser->changeReader( reader );
 }
 
 void SP_XmlSTagReader :: setError( SP_XmlSTagParser * parser, const char * error )
 {
-	return parser->setError( error );
+	parser->setError( error );
 }
 
 void SP_XmlSTagReader :: setName( SP_XmlSTagParser * parser, const char * name )

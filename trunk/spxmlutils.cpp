@@ -271,7 +271,23 @@ int SP_XmlStringUtils :: decode( const char * encodeValue,
 				outBuffer->append( XML_CHARS[ index ] );
 				pos += len;
 			} else {
-				outBuffer->append( *pos++ );
+				char * next = "";
+				int ch = 0;
+				if( '#' == *( pos + 1 ) ) {
+					if( 'x' == *( pos + 2 ) ) {
+						ch = strtol( pos + 3, &next, 16 );
+					} else {
+						ch = strtol( pos + 2, &next, 10 );
+					}
+				}
+
+				// TODO: fully support xml entity, currently only support printable and space char
+				if( ';' == *next && isascii( ch ) && ( isprint( ch ) || isspace( ch ) ) ) {
+					outBuffer->append( ch );
+					pos = next + 1;
+				} else {
+					outBuffer->append( *pos++ );
+				}
 			}
 		} else {
 			outBuffer->append( *pos++ );
@@ -307,20 +323,6 @@ int SP_XmlStringUtils :: isNameChar( char c )
 {
 	return isalnum(c) || c == ':' || c == '-' || c == '.' || c == '_';
 }
-
-#ifdef WIN32
-int snprintf(char *s,  size_t  n,  const  char  *format,  /*args*/ ...)
-{
-	int ret = 0;
-
-	va_list vaList;
-	va_start( vaList, format );
-	ret = vsprintf( s, format, vaList );
-	va_end( vaList );
-
-	return ret;
-}
-#endif
 
 //=========================================================
 

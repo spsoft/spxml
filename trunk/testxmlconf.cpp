@@ -37,10 +37,15 @@ int main( int argc, char * argv[] )
 	}
 
 	SP_XmlDomParser parser;
-
+	parser.setIgnoreWhitespace( 0 );
 	parser.append( source, strlen( source ) );
 
 	free( source );
+
+	if( NULL != parser.getError() ) {
+		printf( "\n\nerror: %s\n", parser.getError() );
+		exit( -1 );
+	}
 
 	SP_CanonXmlBuffer buffer( parser.getDocument() );
 	{

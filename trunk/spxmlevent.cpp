@@ -186,14 +186,16 @@ SP_XmlStartTagEvent :: ~SP_XmlStartTagEvent()
 	if( NULL != mName ) free( mName );
 	mName = NULL;
 
-	for( int i = 0; i < mAttrNameList->getCount(); i++ ) {
+	int i = 0;
+
+	for( i = 0; i < mAttrNameList->getCount(); i++ ) {
 		free( (char*)mAttrNameList->getItem( i ) );
 	}
 
 	delete mAttrNameList;
 	mAttrNameList = NULL;
 
-	for( int i = 0; i < mAttrValueList->getCount(); i++ ) {
+	for( i = 0; i < mAttrValueList->getCount(); i++ ) {
 		free( (char*)mAttrValueList->getItem( i ) );
 	}
 	delete mAttrValueList;

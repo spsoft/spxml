@@ -14,20 +14,28 @@
 
 int main( int argc, char * argv[] )
 {
+	char * filename = NULL;
+
 	if( argc < 2 ) {
+#		ifdef WIN32
+		filename = "..\\test.xml";
+#		else
 		printf( "Usage: %s <xml_file>\n", argv[0] );
 		exit( -1 );
+#		endif
+	} else {
+		filename = argv[1];
 	}
 
-	FILE * fp = fopen ( argv[1], "r" );
+	FILE * fp = fopen ( filename, "r" );
 	if( NULL == fp ) {
-		printf( "cannot not open %s\n", argv[1] );
+		printf( "cannot not open %s\n", filename );
 		exit( -1 );
 	}
 
 	struct stat aStat;
 	char * source = NULL;
-	stat( argv[1], &aStat );
+	stat( filename, &aStat );
 	source = ( char * ) malloc ( aStat.st_size + 1 );
 	fread ( source, aStat.st_size, sizeof ( char ), fp );
 	fclose ( fp );
@@ -105,6 +113,10 @@ int main( int argc, char * argv[] )
 	if( NULL != parser.getError() ) {
 		printf( "\n\nerror: %s\n", parser.getError() );
 	}
+
+#ifdef WIN32
+	getchar();
+#endif
 
 	return 0;
 }

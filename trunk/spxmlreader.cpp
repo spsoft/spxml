@@ -29,7 +29,7 @@ SP_XmlReader :: ~SP_XmlReader()
 void SP_XmlReader :: changeReader(
 		SP_XmlPullParser * parser, SP_XmlReader * reader )
 {
-	return parser->changeReader( reader );
+	parser->changeReader( reader );
 }
 
 SP_XmlReader * SP_XmlReader :: getReader( SP_XmlPullParser * parser, int type )
