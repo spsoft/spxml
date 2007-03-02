@@ -260,14 +260,16 @@ void SP_XmlDomBuffer :: dumpElement(
 		const SP_XmlNode * node, SP_XmlStringBuffer * buffer, int level )
 {
 	if( SP_XmlNode::eELEMENT == node->getType() ) {
-		for( int i = 0; i < level; i++ ) buffer->append( '\t' );
+		int i = 0;
+
+		for( i = 0; i < level; i++ ) buffer->append( '\t' );
 
 		SP_XmlElementNode * element = static_cast<SP_XmlElementNode*>((SP_XmlNode*)node);
 		buffer->append( "<" );
 		buffer->append( element->getName() );
 
 		const char * name = NULL, * value = NULL;
-		for( int i = 0; i < element->getAttrCount(); i++ ) {
+		for( i = 0; i < element->getAttrCount(); i++ ) {
 			name = element->getAttr( i, &value );
 			if( NULL != name && NULL != value ) {
 				buffer->append( ' ' );

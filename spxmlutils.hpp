@@ -87,8 +87,8 @@ private:
 };
 
 #ifdef WIN32
-int snprintf(char *s,  size_t  n,  const  char  *format,  /*args*/ ...);
 
+#define snprintf _snprintf
 #define strncasecmp strnicmp
 #define strcasecmp  stricmp
 #endif

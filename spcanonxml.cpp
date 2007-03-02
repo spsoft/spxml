@@ -32,26 +32,33 @@ int SP_CanonXmlBuffer :: getSize() const
 	return mBuffer->getSize();
 }
 
+void SP_CanonXmlBuffer :: canonEncode( const char * value, SP_XmlStringBuffer * buffer )
+{
+	SP_XmlStringBuffer temp;
+	SP_XmlStringUtils::encode( value, &temp );
+
+	for( const char * pos = temp.getBuffer(); '\0' != *pos; pos++ ) {
+		if( '\r' == *pos ) {
+		} else if( '\n' == *pos ) {
+			buffer->append( "&#10;" );
+		} else {
+			buffer->append( *pos );
+		}
+	}
+}
+
 void SP_CanonXmlBuffer :: dump(
 		const SP_XmlNode * node, SP_XmlStringBuffer * buffer )
 {
+	if( NULL == node ) return;
+
 	if( SP_XmlNode::eXMLDOC == node->getType() ) {
 		SP_XmlDocument * document = static_cast<SP_XmlDocument*>((SP_XmlNode*)node);
 		dumpElement( document->getRootElement(), buffer );
 	} else if( SP_XmlNode::eCDATA == node->getType() ) {
 		SP_XmlCDataNode * cdata = static_cast<SP_XmlCDataNode*>((SP_XmlNode*)node);
 
-		SP_XmlStringBuffer temp;
-		SP_XmlStringUtils::encode( cdata->getText(), &temp );
-
-		for( const char * pos = temp.getBuffer(); '\0' != *pos; pos++ ) {
-			if( '\r' == *pos ) {
-			} else if( '\n' == *pos ) {
-				buffer->append( "&#10;" );
-			} else {
-				buffer->append( *pos );
-			}
-		}
+		canonEncode( cdata->getText(), buffer );
 	} else if( SP_XmlNode::eCOMMENT == node->getType() ) {
 		// ignore
 	} else if( SP_XmlNode::eELEMENT == node->getType() ) {
@@ -68,26 +75,30 @@ void SP_CanonXmlBuffer :: dump(
 void SP_CanonXmlBuffer :: dumpElement(
 		const SP_XmlNode * node, SP_XmlStringBuffer * buffer )
 {
+	if( NULL == node ) return;
+
 	if( SP_XmlNode::eELEMENT == node->getType() ) {
 		SP_XmlElementNode * element = static_cast<SP_XmlElementNode*>((SP_XmlNode*)node);
 		buffer->append( "<" );
 		buffer->append( element->getName() );
 
+		int i = 0;
+
 		SP_XmlArrayList attrList;
-		for( int i = 0; i < element->getAttrCount(); i++ ) {
+		for( i = 0; i < element->getAttrCount(); i++ ) {
 			attrList.append( (void*)element->getAttr( i, NULL ) );
 		}
 		attrList.sort( reinterpret_cast<int(*)(const void*, const void*)>(strcmp) );
 
 		const char * name = NULL, * value = NULL;
-		for( int i = 0; i < attrList.getCount(); i++ ) {
+		for( i = 0; i < attrList.getCount(); i++ ) {
 			name = (char*)attrList.getItem( i );
 			value = element->getAttrValue( name );
 			if( NULL != name && NULL != value ) {
 				buffer->append( ' ' );
 				buffer->append( name );
 				buffer->append( "=\"" );
-				SP_XmlStringUtils::encode( value, buffer );
+				canonEncode( value, buffer );
 				buffer->append( "\"" );
 			}
 		}
