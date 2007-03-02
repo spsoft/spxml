@@ -220,15 +220,19 @@ SP_XmlPullEvent * SP_XmlPCDataReader :: getEvent( SP_XmlPullParser * parser )
 {
 	SP_XmlCDataEvent * retEvent = NULL;
 
-	int ignoreWhitespace = 1;
-	for( const char * pos = mBuffer->getBuffer(); '\0' != *pos; pos++ ) {
-		if( !isspace( *pos ) ) {
-			ignoreWhitespace = 0;
-			break;
+	int ignore = 0;
+
+	if( 0 != parser->getIgnoreWhitespace() ) {
+		ignore = 1;
+		for( const char * pos = mBuffer->getBuffer(); '\0' != *pos; pos++ ) {
+			if( !isspace( *pos ) ) {
+				ignore = 0;
+				break;
+			}
 		}
 	}
 
-	if( 0 == ignoreWhitespace ) {
+	if( 0 == ignore && mBuffer->getSize() > 0 ) {
 		retEvent = new SP_XmlCDataEvent();
 		SP_XmlStringBuffer buffer;
 		SP_XmlStringUtils::decode( mBuffer->getBuffer(), &buffer );
@@ -270,20 +274,23 @@ SP_XmlPullEvent * SP_XmlCDataSectionReader :: getEvent( SP_XmlPullParser * parse
 
 	int len = mBuffer->getSize();
 	const char * data = mBuffer->getBuffer();
-	if( 0 == strcmp( data, "CDATA[" ) ) {
+	if( 0 == strncmp( data, "CDATA[", strlen( "CDATA[" ) ) ) {
 		data += strlen( "CDATA[" );
 		len -= strlen( "CDATA[" );
 	}
 
-	int ignoreWhitespace = 1;
-	for( int i = 0; i < len - 2; i++ ) {
-		if( !isspace( data[i] ) ) {
-			ignoreWhitespace = 0;
-			break;
+	int ignore = 0;
+	if( 0 != parser->getIgnoreWhitespace() ) {
+		ignore = 1;
+		for( int i = 0; i < len - 2; i++ ) {
+			if( !isspace( data[i] ) ) {
+				ignore = 0;
+				break;
+			}
 		}
 	}
 
-	if( 0 == ignoreWhitespace ) {
+	if( 0 == ignore && len > 2 ) {
 		retEvent = new SP_XmlCDataEvent();
 		retEvent->setText( data, len - 2 );
 	}

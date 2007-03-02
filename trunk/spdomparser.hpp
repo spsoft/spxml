@@ -30,6 +30,10 @@ public:
 	/// get the parse result
 	const SP_XmlDocument * getDocument() const;
 
+	void setIgnoreWhitespace( int ignoreWhitespace );
+
+	int getIgnoreWhitespace();
+
 private:
 	void buildTree();
 
@@ -44,7 +48,7 @@ private:
 /// serialize xml node tree to string
 class SP_XmlDomBuffer {
 public:
-	SP_XmlDomBuffer( const SP_XmlNode * node );
+	SP_XmlDomBuffer( const SP_XmlNode * node, int indent = 1 );
 	~SP_XmlDomBuffer();
 
 	const char * getBuffer() const;
@@ -55,9 +59,9 @@ private:
 	SP_XmlDomBuffer & operator=( SP_XmlDomBuffer & );
 
 	static void dumpDocDecl( const SP_XmlDocDeclNode * docDecl,
-			SP_XmlStringBuffer * buffer );
+			SP_XmlStringBuffer * buffer, int level );
 	static void dumpDocType( const SP_XmlDocTypeNode * docType,
-			SP_XmlStringBuffer * buffer );
+			SP_XmlStringBuffer * buffer, int level );
 	static void dump( const SP_XmlNode * node,
 			SP_XmlStringBuffer * buffer, int level );
 	static void dumpElement( const SP_XmlNode * node,
