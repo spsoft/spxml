@@ -248,6 +248,23 @@ const char * SP_XmlStartTagEvent :: getAttr( int index, const char ** value ) co
 	return name;
 }
 
+void SP_XmlStartTagEvent :: removeAttr( const char * name )
+{
+	int index = -1;
+
+	for( int i = 0; i < mAttrNameList->getCount(); i++ ) {
+		if( 0 == strcmp( name, (char*)mAttrNameList->getItem( i ) ) ) {
+			index = i;
+			break;
+		}
+	}
+
+	if( index >= 0 ) {
+		free( mAttrNameList->takeItem( index ) );
+		free( mAttrValueList->takeItem( index ) );
+	}
+}
+
 //=========================================================
 
 SP_XmlTextEvent :: SP_XmlTextEvent( int eventType )

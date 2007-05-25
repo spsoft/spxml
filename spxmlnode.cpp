@@ -311,6 +311,11 @@ const char * SP_XmlElementNode :: getAttr( int index, const char ** value ) cons
 	return mEvent->getAttr( index, value );
 }
 
+void SP_XmlElementNode :: removeAttr( const char * name )
+{
+	mEvent->removeAttr( name );
+}
+
 //=========================================================
 
 SP_XmlCDataNode :: SP_XmlCDataNode()
