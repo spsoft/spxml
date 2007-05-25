@@ -125,6 +125,8 @@ public:
 	int getAttrCount() const;
 	const char * getAttr( int index, const char ** value ) const;
 
+	void removeAttr( const char * name );
+
 protected:
 	SP_XmlStartTagEvent * mEvent;
 	SP_XmlNodeList * mChildren;

@@ -110,6 +110,8 @@ public:
 	/// get attribute name and value by index, return attribute name
 	const char * getAttr( int index, const char ** value ) const;
 
+	void removeAttr( const char * name );
+
 private:
 	char * mName;
 	SP_XmlArrayList * mAttrNameList;
