@@ -3,9 +3,9 @@
 
 CC = gcc
 AR = ar cru
-CFLAGS = -Wall -D_REENTRANT -D_GNU_SOURCE -g
+CFLAGS = -Wall -D_REENTRANT -D_GNU_SOURCE -g -fPIC
 SOFLAGS = -shared
-LDFLAGS =
+LDFLAGS = -lstdc++
 
 LINKER = $(CC)
 LINT = lint -c
