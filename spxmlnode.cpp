@@ -72,7 +72,7 @@ const SP_XmlNode * SP_XmlNodeList :: get( int index ) const
 	return (SP_XmlNode*)mList->getItem( index );
 }
 
-const SP_XmlNode * SP_XmlNodeList :: take( int index ) const
+SP_XmlNode * SP_XmlNodeList :: take( int index ) const
 {
 	return (SP_XmlNode*)mList->takeItem( index );
 }
@@ -84,7 +84,7 @@ SP_XmlDocument :: SP_XmlDocument()
 {
 	mDocDecl = NULL;
 	mDocType = NULL;
-	mRootElement = NULL;
+	mChildren = new SP_XmlNodeList();
 }
 
 SP_XmlDocument :: ~SP_XmlDocument()
@@ -95,8 +95,8 @@ SP_XmlDocument :: ~SP_XmlDocument()
 	if( NULL != mDocType ) delete mDocType;
 	mDocType = NULL;
 
-	if( NULL != mRootElement ) delete mRootElement;
-	mRootElement = NULL;
+	if( NULL != mChildren ) delete mChildren;
+	mChildren = NULL;
 }
 
 void SP_XmlDocument :: setDocDecl( SP_XmlDocDeclNode * docDecl )
@@ -125,14 +125,44 @@ SP_XmlDocTypeNode * SP_XmlDocument :: getDocType() const
 
 void SP_XmlDocument :: setRootElement( SP_XmlElementNode * rootElement )
 {
-	if( NULL != mRootElement ) delete mRootElement;
+	int index = -1;
+	for( int i = 0; i < mChildren->getLength(); i++ ) {
+		const SP_XmlNode * node = mChildren->get( i );
+
+		if( SP_XmlNode::eELEMENT == node->getType() ) {
+			index = i;
+			break;
+		}
+	}
+
+	if( index >= 0 ) {
+		SP_XmlNode * node = mChildren->take( index );
+		delete node;
+	}
+
+	mChildren->append( rootElement );
 	rootElement->setParent( this );
-	mRootElement = rootElement;
 }
 
 SP_XmlElementNode * SP_XmlDocument :: getRootElement() const
 {
-	return mRootElement;
+	SP_XmlElementNode * ret = NULL;
+
+	for( int i = 0; i < mChildren->getLength(); i++ ) {
+		const SP_XmlNode * node = mChildren->get( i );
+
+		if( SP_XmlNode::eELEMENT == node->getType() ) {
+			ret = (SP_XmlElementNode*)node;
+			break;
+		}
+	}
+
+	return ret;
+}
+
+SP_XmlNodeList * SP_XmlDocument :: getChildren() const
+{
+	return mChildren;
 }
 
 //=========================================================

@@ -128,7 +128,8 @@ void SP_XmlDomParser :: buildTree()
 					if( NULL != mCurrent ) {
 						mCurrent->addChild( new SP_XmlPINode( (SP_XmlPIEvent*)event ) );
 					} else {
-						delete event;
+						mDocument->getChildren()->append(
+								new SP_XmlPINode( (SP_XmlPIEvent*)event ) );
 					}
 					break;
 				}
@@ -188,7 +189,11 @@ void SP_XmlDomBuffer :: dump( const char * encoding,
 		SP_XmlDocument * document = static_cast<SP_XmlDocument*>((SP_XmlNode*)node);
 		dumpDocDecl( encoding, document->getDocDecl(), buffer, level );
 		dumpDocType( encoding, document->getDocType(), buffer, level );
-		dumpElement( encoding, document->getRootElement(), buffer, level );
+
+		const SP_XmlNodeList * children = document->getChildren();
+		for( int j = 0; j < children->getLength(); j++ ) {
+			dump( encoding, children->get( j ), buffer, level );
+		}
 	} else if( SP_XmlNode::eCDATA == node->getType() ) {
 		SP_XmlCDataNode * cdata = static_cast<SP_XmlCDataNode*>((SP_XmlNode*)node);
 		SP_XmlStringCodec::encode( encoding, cdata->getText(), buffer );

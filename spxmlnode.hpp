@@ -36,7 +36,7 @@ public:
 	int getLength() const;
 	void append( SP_XmlNode * node );
 	const SP_XmlNode * get( int index ) const;
-	const SP_XmlNode * take( int index ) const;
+	SP_XmlNode * take( int index ) const;
 
 private:
 	SP_XmlNodeList( SP_XmlNodeList & );
@@ -67,11 +67,12 @@ public:
 	SP_XmlDocTypeNode * getDocType() const;
 	void setRootElement( SP_XmlElementNode * rootElement );
 	SP_XmlElementNode * getRootElement() const;
+	SP_XmlNodeList * getChildren() const;
 
 private:
 	SP_XmlDocDeclNode * mDocDecl;
 	SP_XmlDocTypeNode * mDocType;
-	SP_XmlElementNode * mRootElement;
+	SP_XmlNodeList * mChildren;
 };
 
 class SP_XmlPINode : public SP_XmlNode {

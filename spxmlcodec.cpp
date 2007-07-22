@@ -97,7 +97,7 @@ int SP_XmlStringCodec :: encode( const char * encoding, const char * decodeValue
 			} else {
 				if( *pos < 32 ) {
 					char temp[ 32 ] = { 0 };
-					snprintf( temp, sizeof( temp ), "&#x%02X;", *pos );
+					snprintf( temp, sizeof( temp ), "&#x%02x;", *pos );
 					outBuffer->append( temp );
 				} else {
 					outBuffer->append( *pos );
