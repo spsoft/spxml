@@ -9,6 +9,7 @@
 
 #include "spxmlnode.hpp"
 #include "spxmlutils.hpp"
+#include "spxmlcodec.hpp"
 
 SP_CanonXmlBuffer :: SP_CanonXmlBuffer( const SP_XmlNode * node )
 {
@@ -35,7 +36,7 @@ int SP_CanonXmlBuffer :: getSize() const
 void SP_CanonXmlBuffer :: canonEncode( const char * value, SP_XmlStringBuffer * buffer )
 {
 	SP_XmlStringBuffer temp;
-	SP_XmlStringUtils::encode( value, &temp );
+	SP_XmlStringCodec::encode( value, &temp );
 
 	for( const char * pos = temp.getBuffer(); '\0' != *pos; pos++ ) {
 		if( '\r' == *pos ) {

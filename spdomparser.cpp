@@ -10,6 +10,7 @@
 #include "spxmlevent.hpp"
 #include "spxmlutils.hpp"
 #include "spxmlnode.hpp"
+#include "spxmlcodec.hpp"
 
 //=========================================================
 
@@ -170,7 +171,7 @@ void SP_XmlDomBuffer :: dump(
 		dumpElement( document->getRootElement(), buffer, level );
 	} else if( SP_XmlNode::eCDATA == node->getType() ) {
 		SP_XmlCDataNode * cdata = static_cast<SP_XmlCDataNode*>((SP_XmlNode*)node);
-		SP_XmlStringUtils::encode( cdata->getText(), buffer );
+		SP_XmlStringCodec::encode( cdata->getText(), buffer );
 	} else if( SP_XmlNode::eCOMMENT == node->getType() ) {
 		SP_XmlCommentNode * comment = static_cast<SP_XmlCommentNode*>((SP_XmlNode*)node);
 
@@ -275,7 +276,7 @@ void SP_XmlDomBuffer :: dumpElement(
 				buffer->append( ' ' );
 				buffer->append( name );
 				buffer->append( "=\"" );
-				SP_XmlStringUtils::encode( value, buffer );
+				SP_XmlStringCodec::encode( value, buffer );
 				buffer->append( "\"" );
 			}
 		}
