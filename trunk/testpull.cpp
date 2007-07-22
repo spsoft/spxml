@@ -11,6 +11,7 @@
 #include "spxmlparser.hpp"
 #include "spxmlevent.hpp"
 #include "spxmlutils.hpp"
+#include "spxmlcodec.hpp"
 
 int main( int argc, char * argv[] )
 {
@@ -98,7 +99,7 @@ int main( int argc, char * argv[] )
 			case SP_XmlPullEvent::eCData:
 				{
 					SP_XmlStringBuffer buffer;
-					SP_XmlStringUtils::encode( ((SP_XmlTextEvent*)event)->getText(), &buffer );
+					SP_XmlStringCodec::encode( ((SP_XmlTextEvent*)event)->getText(), &buffer );
 					printf( "%s", buffer.getBuffer() );
 					break;
 				}

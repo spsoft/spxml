@@ -71,21 +71,6 @@ private:
 	int mSize;	
 };
 
-class SP_XmlStringUtils {
-public:
-	static int decode(
-			const char * encodeValue, SP_XmlStringBuffer * outBuffer );
-	static int encode(
-			const char * decodeValue, SP_XmlStringBuffer * outBuffer );
-	static int isNameChar( char c );
-
-private:
-	static const char XML_CHARS [];
-	static const char * ESC_CHARS [];
-
-	SP_XmlStringUtils();
-};
-
 #ifdef WIN32
 
 #define snprintf _snprintf

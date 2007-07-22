@@ -97,6 +97,10 @@ SOURCE=..\spdomparser.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\spxmlcodec.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\spxmlevent.cpp
 # End Source File
 # Begin Source File
@@ -134,6 +138,10 @@ SOURCE=..\spdomiterator.hpp
 # Begin Source File
 
 SOURCE=..\spdomparser.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\spxmlcodec.hpp
 # End Source File
 # Begin Source File
 

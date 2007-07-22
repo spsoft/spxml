@@ -11,6 +11,7 @@
 #include "spxmlstag.hpp"
 #include "spxmlutils.hpp"
 #include "spxmlevent.hpp"
+#include "spxmlcodec.hpp"
 
 SP_XmlSTagParser :: SP_XmlSTagParser()
 {
@@ -108,7 +109,7 @@ void SP_XmlSTagReader :: addAttrName( SP_XmlSTagParser * parser, const char * na
 void SP_XmlSTagReader :: addAttrValue( SP_XmlSTagParser * parser, const char * value )
 {
 	SP_XmlStringBuffer decodeValue;
-	SP_XmlStringUtils::decode( value, &decodeValue );
+	SP_XmlStringCodec::decode( value, &decodeValue );
 
 	parser->mEvent->addAttr( parser->mStartTagName->getBuffer(), decodeValue.getBuffer() );
 	parser->mStartTagName->clean();

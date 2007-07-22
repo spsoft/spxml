@@ -13,6 +13,7 @@
 #include "spxmlutils.hpp"
 #include "spxmlstag.hpp"
 #include "spxmlevent.hpp"
+#include "spxmlcodec.hpp"
 
 //=========================================================
 
@@ -235,7 +236,7 @@ SP_XmlPullEvent * SP_XmlPCDataReader :: getEvent( SP_XmlPullParser * parser )
 	if( 0 == ignore && mBuffer->getSize() > 0 ) {
 		retEvent = new SP_XmlCDataEvent();
 		SP_XmlStringBuffer buffer;
-		SP_XmlStringUtils::decode( mBuffer->getBuffer(), &buffer );
+		SP_XmlStringCodec::decode( mBuffer->getBuffer(), &buffer );
 		retEvent->setText( buffer.getBuffer(), buffer.getSize() );
 	}
 
@@ -424,7 +425,7 @@ void SP_XmlLeftBracketReader :: read( SP_XmlPullParser * parser, char c )
 			changeReader( parser, getReader( parser, SP_XmlReader::eETag ) );
 		} else if( '!' == c ) {
 			changeReader( parser, getReader( parser, SP_XmlReader::eSign ) );
-		} else if( SP_XmlStringUtils::isNameChar( c ) ) {
+		} else if( SP_XmlStringCodec::isNameChar( c ) ) {
 			SP_XmlReader * reader = getReader( parser, SP_XmlReader::eSTag );
 			reader->read( parser, c );
 			changeReader( parser, reader );

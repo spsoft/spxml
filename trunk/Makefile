@@ -18,7 +18,7 @@ endif
 #--------------------------------------------------------------------
 
 LIBOBJS = spxmlutils.o spxmlevent.o spxmlreader.o spxmlparser.o spxmlstag.o \
-		spxmlnode.o spdomparser.o spdomiterator.o
+		spxmlnode.o spdomparser.o spdomiterator.o spxmlcodec.o
 
 TARGET =  libspxml.so \
 		testpull testdom testxmlconf
@@ -42,7 +42,7 @@ testxmlconf: testxmlconf.o spcanonxml.o
 dist: clean spxml-$(version).src.tar.gz
 
 spxml-$(version).src.tar.gz:
-	@ls | sed s:^:spxml-$(version)/: > MANIFEST
+	@find . -type f | grep -v CVS | grep -v .svn | sed s:^./:spxml-$(version)/: > MANIFEST
 	@(cd ..; ln -s spxml spxml-$(version))
 	(cd ..; tar -czvf spxml/spxml-$(version).src.tar.gz `cat spxml/MANIFEST`)
 	@(cd ..; rm spxml-$(version))
