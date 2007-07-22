@@ -1,3 +1,7 @@
+/*
+ * Copyright 2007 Stephen Liu
+ * For license terms, see the file COPYING along with this library.
+ */
 
 #include <string.h>
 #include <stdlib.h>
@@ -89,7 +93,7 @@ int SP_XmlStringCodec :: encode( const char * encoding, const char * decodeValue
 					pos += len - 1;
 
 					char temp[ 32 ] = { 0 };
-					snprintf( temp, sizeof( temp ), "&#x%x;", ch );
+					snprintf( temp, sizeof( temp ), "&#%d;", ch );
 					outBuffer->append( temp );
 				} else {
 					outBuffer->append( *pos );
@@ -97,7 +101,7 @@ int SP_XmlStringCodec :: encode( const char * encoding, const char * decodeValue
 			} else {
 				if( *pos < 32 ) {
 					char temp[ 32 ] = { 0 };
-					snprintf( temp, sizeof( temp ), "&#x%02x;", *pos );
+					snprintf( temp, sizeof( temp ), "&#%d;", *pos );
 					outBuffer->append( temp );
 				} else {
 					outBuffer->append( *pos );
@@ -109,9 +113,13 @@ int SP_XmlStringCodec :: encode( const char * encoding, const char * decodeValue
 	return 0;
 }
 
-int SP_XmlStringCodec :: isNameChar( char c )
+int SP_XmlStringCodec :: isNameChar( const char * encoding, char c )
 {
-	return isalnum(c) || c == ':' || c == '-' || c == '.' || c == '_';
+	if( 0 == strcasecmp( encoding, "utf-8" ) ) {
+		return 1;
+	} else {
+		return isalnum(c) || c == ':' || c == '-' || c == '.' || c == '_';
+	}
 }
 
 //=========================================================
