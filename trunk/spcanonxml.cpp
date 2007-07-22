@@ -56,7 +56,10 @@ void SP_CanonXmlBuffer :: dump(
 
 	if( SP_XmlNode::eXMLDOC == node->getType() ) {
 		SP_XmlDocument * document = static_cast<SP_XmlDocument*>((SP_XmlNode*)node);
-		dumpElement( document->getRootElement(), buffer );
+		const SP_XmlNodeList * children = document->getChildren();
+		for( int j = 0; j < children->getLength(); j++ ) {
+			dump( children->get( j ), buffer );
+		}
 	} else if( SP_XmlNode::eCDATA == node->getType() ) {
 		SP_XmlCDataNode * cdata = static_cast<SP_XmlCDataNode*>((SP_XmlNode*)node);
 
