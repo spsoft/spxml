@@ -465,7 +465,7 @@ void SP_XmlLeftBracketReader :: read( SP_XmlPullParser * parser, char c )
 			changeReader( parser, getReader( parser, SP_XmlReader::eETag ) );
 		} else if( '!' == c ) {
 			changeReader( parser, getReader( parser, SP_XmlReader::eSign ) );
-		} else if( SP_XmlStringCodec::isNameChar( c ) ) {
+		} else if( SP_XmlStringCodec::isNameChar( parser->getEncoding(), c ) ) {
 			SP_XmlReader * reader = getReader( parser, SP_XmlReader::eSTag );
 			reader->read( parser, c );
 			changeReader( parser, reader );

@@ -1,3 +1,7 @@
+/*
+ * Copyright 2007 Stephen Liu
+ * For license terms, see the file COPYING along with this library.
+ */
 
 #ifndef __spxmlcodec_hpp__
 #define __spxmlcodec_hpp__
@@ -13,7 +17,7 @@ public:
 			const char * encodeValue, SP_XmlStringBuffer * outBuffer );
 	static int encode( const char * encoding,
 			const char * decodeValue, SP_XmlStringBuffer * outBuffer );
-	static int isNameChar( char c );
+	static int isNameChar( const char * encoding, char c );
 
 private:
 	static const char XML_CHARS [];
