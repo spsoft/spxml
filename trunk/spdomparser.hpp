@@ -34,6 +34,8 @@ public:
 
 	int getIgnoreWhitespace();
 
+	const char * getEncoding();
+
 private:
 	void buildTree();
 
@@ -49,6 +51,7 @@ private:
 class SP_XmlDomBuffer {
 public:
 	SP_XmlDomBuffer( const SP_XmlNode * node, int indent = 1 );
+	SP_XmlDomBuffer( const char * encoding, const SP_XmlNode * node, int indent = 1 );
 	~SP_XmlDomBuffer();
 
 	const char * getBuffer() const;
@@ -58,13 +61,17 @@ private:
 	SP_XmlDomBuffer( SP_XmlDomBuffer & );
 	SP_XmlDomBuffer & operator=( SP_XmlDomBuffer & );
 
-	static void dumpDocDecl( const SP_XmlDocDeclNode * docDecl,
+	static void dumpDocDecl( const char * encoding,
+			const SP_XmlDocDeclNode * docDecl,
 			SP_XmlStringBuffer * buffer, int level );
-	static void dumpDocType( const SP_XmlDocTypeNode * docType,
+	static void dumpDocType( const char * encoding,
+			const SP_XmlDocTypeNode * docType,
 			SP_XmlStringBuffer * buffer, int level );
-	static void dump( const SP_XmlNode * node,
+	static void dump( const char * encoding,
+			const SP_XmlNode * node,
 			SP_XmlStringBuffer * buffer, int level );
-	static void dumpElement( const SP_XmlNode * node,
+	static void dumpElement( const char * encoding,
+			const SP_XmlNode * node,
 			SP_XmlStringBuffer * buffer, int level );
 
 	SP_XmlStringBuffer * mBuffer;

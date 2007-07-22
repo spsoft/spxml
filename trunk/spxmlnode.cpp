@@ -137,6 +137,46 @@ SP_XmlElementNode * SP_XmlDocument :: getRootElement() const
 
 //=========================================================
 
+SP_XmlPINode :: SP_XmlPINode()
+	: SP_XmlNode( ePI )
+{
+	mEvent = new SP_XmlPIEvent();
+}
+
+SP_XmlPINode :: SP_XmlPINode( SP_XmlPIEvent * event )
+	: SP_XmlNode( ePI )
+{
+	mEvent = event;
+}
+
+SP_XmlPINode :: ~SP_XmlPINode()
+{
+	if( NULL != mEvent ) delete mEvent;
+	mEvent = NULL;
+}
+
+void SP_XmlPINode :: setTarget( const char * target )
+{
+	mEvent->setTarget( target );
+}
+
+const char * SP_XmlPINode :: getTarget()
+{
+	return mEvent->getTarget();
+}
+
+void SP_XmlPINode :: setData( const char * data )
+{
+	mEvent->setData( data, strlen( data ) );
+}
+
+const char * SP_XmlPINode :: getData()
+{
+	return mEvent->getData();
+}
+
+//=========================================================
+
 SP_XmlDocDeclNode :: SP_XmlDocDeclNode()
 	: SP_XmlNode( eDOCDECL )
 {

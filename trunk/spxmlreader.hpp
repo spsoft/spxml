@@ -13,7 +13,7 @@ class SP_XmlStringBuffer;
 class SP_XmlReader {
 public:
 	enum { MAX_READER = 16 };
-	enum { eDocDecl, eDocType, eSTag, eETag, ePCData,
+	enum { ePI, eDocType, eSTag, eETag, ePCData,
 		eCDataSection, eComment, eLBracket, eSign };
 
 	/**
@@ -48,19 +48,23 @@ protected:
 	SP_XmlReader * getReader( SP_XmlPullParser * parser, int type );
 
 	/// help to call parser->setError
-	void setError( SP_XmlPullParser * parser, const char * error );
+	static void setError( SP_XmlPullParser * parser, const char * error );
 
 private:
 	SP_XmlReader( SP_XmlReader & );
 	SP_XmlReader & operator=( SP_XmlReader & );
 };
 
-class SP_XmlDocDeclReader : public SP_XmlReader {
+class SP_XmlPIReader : public SP_XmlReader {
 public:
-	SP_XmlDocDeclReader();
-	virtual ~SP_XmlDocDeclReader();
+	SP_XmlPIReader();
+	virtual ~SP_XmlPIReader();
 	virtual void read( SP_XmlPullParser * parser, char c );
 	virtual SP_XmlPullEvent * getEvent( SP_XmlPullParser * parser );
+
+private:
+	static SP_XmlPullEvent * parseDocDeclEvent( SP_XmlPullParser * parser,
+			SP_XmlStringBuffer * buffer );
 };
 
 class SP_XmlStartTagReader : public SP_XmlReader {

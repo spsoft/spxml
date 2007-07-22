@@ -11,7 +11,7 @@ class SP_XmlQueue;
 
 class SP_XmlPullEvent {
 public:
-	enum EventType { eStartDocument, eEndDocument,
+	enum EventType { eStartDocument, eEndDocument, ePI,
 			eDocDecl, eDocType, eStartTag, eEndTag, eCData, eComment };
 
 	SP_XmlPullEvent( int eventType );
@@ -75,6 +75,22 @@ private:
 	char mSystemID[ 128 ];
 	char mPublicID[ 128 ];
 	char mDTD[ 256 ];	
+};
+
+class SP_XmlPIEvent : public SP_XmlPullEvent {
+public:
+	SP_XmlPIEvent();
+	~SP_XmlPIEvent();
+
+	void setTarget( const char * target );
+	const char * getTarget();
+
+	void setData( const char * data, int len );
+	const char * getData();
+
+private:
+	char mTarget[ 128 ];
+	char * mData;
 };
 
 class SP_XmlDocDeclEvent : public SP_XmlPullEvent {

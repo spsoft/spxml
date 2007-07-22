@@ -33,10 +33,11 @@ int SP_CanonXmlBuffer :: getSize() const
 	return mBuffer->getSize();
 }
 
-void SP_CanonXmlBuffer :: canonEncode( const char * value, SP_XmlStringBuffer * buffer )
+void SP_CanonXmlBuffer :: canonEncode( const char * value,
+		SP_XmlStringBuffer * buffer )
 {
 	SP_XmlStringBuffer temp;
-	SP_XmlStringCodec::encode( value, &temp );
+	SP_XmlStringCodec::encode( "", value, &temp );
 
 	for( const char * pos = temp.getBuffer(); '\0' != *pos; pos++ ) {
 		if( '\r' == *pos ) {
@@ -60,6 +61,14 @@ void SP_CanonXmlBuffer :: dump(
 		SP_XmlCDataNode * cdata = static_cast<SP_XmlCDataNode*>((SP_XmlNode*)node);
 
 		canonEncode( cdata->getText(), buffer );
+	} else if( SP_XmlNode::ePI == node->getType() ) {
+		SP_XmlPINode * piNode = static_cast<SP_XmlPINode*>((SP_XmlNode*)node);
+
+		buffer->append( "<?" );
+		buffer->append( piNode->getTarget() );
+		if( '\0' != *( piNode->getTarget() ) ) buffer->append( ' ' );
+		buffer->append( piNode->getData() );
+		buffer->append( "?>" );
 	} else if( SP_XmlNode::eCOMMENT == node->getType() ) {
 		// ignore
 	} else if( SP_XmlNode::eELEMENT == node->getType() ) {

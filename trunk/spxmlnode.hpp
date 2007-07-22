@@ -10,7 +10,7 @@ class SP_XmlArrayList;
 
 class SP_XmlNode {
 public:
-	enum { eXMLDOC, eDOCDECL, eDOCTYPE, eELEMENT, eCDATA, eCOMMENT  };
+	enum { eXMLDOC, eDOCDECL, ePI, eDOCTYPE, eELEMENT, eCDATA, eCOMMENT  };
 
 	SP_XmlNode( int type );
 	virtual ~SP_XmlNode();
@@ -45,6 +45,7 @@ private:
 	SP_XmlArrayList * mList;
 };
 
+class SP_XmlPIEvent;
 class SP_XmlDocDeclEvent;
 class SP_XmlDocTypeEvent;
 class SP_XmlStartTagEvent;
@@ -71,6 +72,22 @@ private:
 	SP_XmlDocDeclNode * mDocDecl;
 	SP_XmlDocTypeNode * mDocType;
 	SP_XmlElementNode * mRootElement;
+};
+
+class SP_XmlPINode : public SP_XmlNode {
+public:
+	SP_XmlPINode();
+	SP_XmlPINode( SP_XmlPIEvent * event );
+	virtual ~SP_XmlPINode();
+
+	void setTarget( const char * target );
+	const char * getTarget();
+
+	void setData( const char * data );
+	const char * getData();
+
+private:
+	SP_XmlPIEvent * mEvent;
 };
 
 class SP_XmlDocDeclNode : public SP_XmlNode {

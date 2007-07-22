@@ -40,6 +40,11 @@ int SP_XmlDomParser :: getIgnoreWhitespace()
 	return mParser->getIgnoreWhitespace();
 }
 
+const char * SP_XmlDomParser :: getEncoding()
+{
+	return mParser->getEncoding();
+}
+
 void SP_XmlDomParser :: append( const char * source, int len )
 {
 	for( int pos = 0; pos < len; pos += 64 ) {
@@ -118,6 +123,15 @@ void SP_XmlDomParser :: buildTree()
 					}
 					break;
 				}
+			case SP_XmlPIEvent::ePI:
+				{
+					if( NULL != mCurrent ) {
+						mCurrent->addChild( new SP_XmlPINode( (SP_XmlPIEvent*)event ) );
+					} else {
+						delete event;
+					}
+					break;
+				}
 			default:
 				{
 					assert( 0 );
@@ -142,7 +156,13 @@ const SP_XmlDocument * SP_XmlDomParser :: getDocument() const
 SP_XmlDomBuffer :: SP_XmlDomBuffer( const SP_XmlNode * node, int indent )
 {
 	mBuffer = new SP_XmlStringBuffer();
-	dump( node, mBuffer, indent ? 0 : -1 );
+	dump( SP_XmlStringCodec::DEFAULT_ENCODING, node, mBuffer, indent ? 0 : -1 );
+}
+
+SP_XmlDomBuffer :: SP_XmlDomBuffer( const char * encoding, const SP_XmlNode * node, int indent )
+{
+	mBuffer = new SP_XmlStringBuffer();
+	dump( encoding, node, mBuffer, indent ? 0 : -1 );
 }
 
 SP_XmlDomBuffer :: ~SP_XmlDomBuffer()
@@ -161,17 +181,17 @@ int SP_XmlDomBuffer :: getSize() const
 	return mBuffer->getSize();
 }
 
-void SP_XmlDomBuffer :: dump(
+void SP_XmlDomBuffer :: dump( const char * encoding,
 		const SP_XmlNode * node, SP_XmlStringBuffer * buffer, int level )
 {
 	if( SP_XmlNode::eXMLDOC == node->getType() ) {
 		SP_XmlDocument * document = static_cast<SP_XmlDocument*>((SP_XmlNode*)node);
-		dumpDocDecl( document->getDocDecl(), buffer, level );
-		dumpDocType( document->getDocType(), buffer, level );
-		dumpElement( document->getRootElement(), buffer, level );
+		dumpDocDecl( encoding, document->getDocDecl(), buffer, level );
+		dumpDocType( encoding, document->getDocType(), buffer, level );
+		dumpElement( encoding, document->getRootElement(), buffer, level );
 	} else if( SP_XmlNode::eCDATA == node->getType() ) {
 		SP_XmlCDataNode * cdata = static_cast<SP_XmlCDataNode*>((SP_XmlNode*)node);
-		SP_XmlStringCodec::encode( cdata->getText(), buffer );
+		SP_XmlStringCodec::encode( encoding, cdata->getText(), buffer );
 	} else if( SP_XmlNode::eCOMMENT == node->getType() ) {
 		SP_XmlCommentNode * comment = static_cast<SP_XmlCommentNode*>((SP_XmlNode*)node);
 
@@ -187,17 +207,35 @@ void SP_XmlDomBuffer :: dump(
 			buffer->append( "-->" );
 		}
 	} else if( SP_XmlNode::eELEMENT == node->getType() ) {
-		dumpElement( node, buffer, level );
+		dumpElement( encoding, node, buffer, level );
 	} else if( SP_XmlNode::eDOCDECL == node->getType() ) {
-		dumpDocDecl( (SP_XmlDocDeclNode*)node, buffer, level );
+		dumpDocDecl( encoding, (SP_XmlDocDeclNode*)node, buffer, level );
 	} else if( SP_XmlNode::eDOCTYPE == node->getType() ) {
-		dumpDocType( (SP_XmlDocTypeNode*)node, buffer, level );
+		dumpDocType( encoding, (SP_XmlDocTypeNode*)node, buffer, level );
+	} else if( SP_XmlNode::ePI == node->getType() ) {
+		SP_XmlPINode * piNode = static_cast<SP_XmlPINode*>((SP_XmlNode*)node);
+
+		if( level >= 0 ) {
+			for( int i = 0; i < level; i++ ) buffer->append( '\t' );
+			buffer->append( "<?" );
+			buffer->append( piNode->getTarget() );
+			buffer->append( ' ' );
+			buffer->append( piNode->getData() );
+			buffer->append( "?>\n" );
+		} else {
+			buffer->append( "<?" );
+			buffer->append( piNode->getTarget() );
+			if( '\0' != *( piNode->getTarget() ) ) buffer->append( ' ' );
+			buffer->append( piNode->getData() );
+			buffer->append( "?>" );
+		}
 	} else {
 		// ignore
 	}
 }
 
-void SP_XmlDomBuffer :: dumpDocDecl( const SP_XmlDocDeclNode * docDecl,
+void SP_XmlDomBuffer :: dumpDocDecl( const char * encoding,
+		const SP_XmlDocDeclNode * docDecl,
 		SP_XmlStringBuffer * buffer, int level )
 {
 	if( NULL == docDecl ) return;
@@ -226,7 +264,8 @@ void SP_XmlDomBuffer :: dumpDocDecl( const SP_XmlDocDeclNode * docDecl,
 	buffer->append( level >= 0 ? "?>\n" : "?>" );
 }
 
-void SP_XmlDomBuffer :: dumpDocType( const SP_XmlDocTypeNode * docType,
+void SP_XmlDomBuffer :: dumpDocType( const char * encoding,
+		const SP_XmlDocTypeNode * docType,
 		SP_XmlStringBuffer * buffer, int level )
 {
 	if( NULL == docType ) return;
@@ -257,9 +296,11 @@ void SP_XmlDomBuffer :: dumpDocType( const SP_XmlDocTypeNode * docType,
 	buffer->append( level >= 0 ? ">\n" : ">" );
 }
 
-void SP_XmlDomBuffer :: dumpElement(
+void SP_XmlDomBuffer :: dumpElement( const char * encoding,
 		const SP_XmlNode * node, SP_XmlStringBuffer * buffer, int level )
 {
+	if( NULL == node ) return;
+
 	if( SP_XmlNode::eELEMENT == node->getType() ) {
 		int i = 0;
 
@@ -276,7 +317,7 @@ void SP_XmlDomBuffer :: dumpElement(
 				buffer->append( ' ' );
 				buffer->append( name );
 				buffer->append( "=\"" );
-				SP_XmlStringCodec::encode( value, buffer );
+				SP_XmlStringCodec::encode( encoding, value, buffer );
 				buffer->append( "\"" );
 			}
 		}
@@ -291,7 +332,7 @@ void SP_XmlDomBuffer :: dumpElement(
 			}
 
 			for( int j = 0; j < children->getLength(); j++ ) {
-				dump( children->get( j ), buffer, level >= 0 ? level + 1 : -1 );
+				dump( encoding, children->get( j ), buffer, level >= 0 ? level + 1 : -1 );
 			}
 
 			if( SP_XmlNode::eCDATA != children->get( 0 )->getType() ) {
@@ -304,7 +345,7 @@ void SP_XmlDomBuffer :: dumpElement(
 			buffer->append( level >= 0 ? "/>\n" : ">" );
 		}
 	} else {
-		dump( node, buffer, level );
+		dump( encoding, node, buffer, level );
 	}
 }
 
