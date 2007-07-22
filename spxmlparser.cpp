@@ -12,6 +12,7 @@
 #include "spxmlreader.hpp"
 #include "spxmlutils.hpp"
 #include "spxmlevent.hpp"
+#include "spxmlcodec.hpp"
 
 SP_XmlPullParser :: SP_XmlPullParser()
 {
@@ -31,6 +32,8 @@ SP_XmlPullParser :: SP_XmlPullParser()
 	memset( mErrorSegment, 0, sizeof( mErrorSegment ) );
 	mErrorIndex = 0;
 	mRowIndex = mColIndex = 0;
+
+	memset( mEncoding, 0, sizeof( mEncoding ) );
 }
 
 SP_XmlPullParser :: ~SP_XmlPullParser()
@@ -47,6 +50,15 @@ SP_XmlPullParser :: ~SP_XmlPullParser()
 	delete mReaderPool;
 
 	if( NULL != mError ) free( mError );	
+}
+
+const char * SP_XmlPullParser :: getEncoding()
+{
+	if( '\0' == mEncoding[0] ) {
+		return SP_XmlStringCodec::DEFAULT_ENCODING;
+	}
+
+	return mEncoding;
 }
 
 void SP_XmlPullParser :: append( const char * source, int len )
@@ -132,6 +144,10 @@ void SP_XmlPullParser :: changeReader( SP_XmlReader * reader )
 		}
 
 		if( NULL != event ) {
+			if( SP_XmlPullEvent::eDocDecl == event->getEventType() ) {
+				snprintf( mEncoding, sizeof( mEncoding ), "%s",
+					((SP_XmlDocDeclEvent*)event)->getEncoding() );
+			}
 			mEventQueue->enqueue( event );
 			if( mTagNameStack->getCount() <= 0 && eRootStart == mRootTagState ) {
 				mRootTagState = eRootEnd;

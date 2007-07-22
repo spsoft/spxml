@@ -29,7 +29,8 @@ private:
 	static void dumpElement( const SP_XmlNode * node,
 			SP_XmlStringBuffer * buffer );
 
-	static void canonEncode( const char * value, SP_XmlStringBuffer * buffer );
+	static void canonEncode( const char * value,
+			SP_XmlStringBuffer * buffer );
 
 	SP_XmlStringBuffer * mBuffer;
 };

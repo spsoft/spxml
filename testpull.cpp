@@ -99,12 +99,17 @@ int main( int argc, char * argv[] )
 			case SP_XmlPullEvent::eCData:
 				{
 					SP_XmlStringBuffer buffer;
-					SP_XmlStringCodec::encode( ((SP_XmlTextEvent*)event)->getText(), &buffer );
+					SP_XmlStringCodec::encode( parser.getEncoding(),
+							((SP_XmlTextEvent*)event)->getText(), &buffer );
 					printf( "%s", buffer.getBuffer() );
 					break;
 				}
 			case SP_XmlPullEvent::eComment:
 				printf( "<!--%s-->", ((SP_XmlTextEvent*)event)->getText() );
+				break;
+			case SP_XmlPIEvent::ePI:
+				printf( "<?%s %s?>", ((SP_XmlPIEvent*)event)->getTarget(),
+					((SP_XmlPIEvent*)event)->getData() );
 				break;
 		};
 

@@ -35,6 +35,8 @@ public:
 
 	int getIgnoreWhitespace();
 
+	const char * getEncoding();
+
 protected:
 	void changeReader( SP_XmlReader * reader );
 
@@ -62,6 +64,8 @@ private:
 	char mErrorSegment[ 32 ];
 	int mErrorIndex;
 	int mColIndex, mRowIndex;
+
+	char mEncoding[ 32 ];
 };
 
 #endif

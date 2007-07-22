@@ -12,13 +12,15 @@ class SP_XmlStringBuffer;
 
 class SP_XmlSTagParser {
 public:
-	SP_XmlSTagParser();
+	SP_XmlSTagParser( const char * encoding );
 	~SP_XmlSTagParser();
 
 	void append( const char * source, int len );
 
 	SP_XmlStartTagEvent * takeEvent();
 	const char * getError();
+
+	const char * getEncoding();
 
 protected:
 	void changeReader( SP_XmlSTagReader * reader );
@@ -33,6 +35,7 @@ protected:
 private:
 	SP_XmlSTagReader * mReader;
 	char * mError;
+	char mEncoding[ 32 ];
 };
 
 class SP_XmlSTagReader {

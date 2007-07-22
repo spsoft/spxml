@@ -13,12 +13,14 @@
 #include "spxmlevent.hpp"
 #include "spxmlcodec.hpp"
 
-SP_XmlSTagParser :: SP_XmlSTagParser()
+SP_XmlSTagParser :: SP_XmlSTagParser( const char * encoding )
 {
 	mEvent = new SP_XmlStartTagEvent();
 	mReader = new SP_XmlSTagNameReader();
 	mStartTagName = new SP_XmlStringBuffer();
 	mError = NULL;
+
+	snprintf( mEncoding, sizeof( mEncoding ), "%s", encoding );
 }
 
 SP_XmlSTagParser :: ~SP_XmlSTagParser()
@@ -34,6 +36,11 @@ SP_XmlSTagParser :: ~SP_XmlSTagParser()
 
 	if( NULL != mError ) free( mError );
 	mError = NULL;
+}
+
+const char * SP_XmlSTagParser :: getEncoding()
+{
+	return mEncoding;
 }
 
 SP_XmlStartTagEvent * SP_XmlSTagParser :: takeEvent()
@@ -109,7 +116,7 @@ void SP_XmlSTagReader :: addAttrName( SP_XmlSTagParser * parser, const char * na
 void SP_XmlSTagReader :: addAttrValue( SP_XmlSTagParser * parser, const char * value )
 {
 	SP_XmlStringBuffer decodeValue;
-	SP_XmlStringCodec::decode( value, &decodeValue );
+	SP_XmlStringCodec::decode( parser->getEncoding(), value, &decodeValue );
 
 	parser->mEvent->addAttr( parser->mStartTagName->getBuffer(), decodeValue.getBuffer() );
 	parser->mStartTagName->clean();

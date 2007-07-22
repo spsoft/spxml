@@ -129,6 +129,46 @@ const char * SP_XmlDocTypeEvent :: getDTD() const
 
 //=========================================================
 
+SP_XmlPIEvent :: SP_XmlPIEvent()
+	: SP_XmlPullEvent( ePI )
+{
+	memset( mTarget, 0, sizeof( mTarget ) );
+	mData = NULL;
+}
+
+SP_XmlPIEvent :: ~SP_XmlPIEvent()
+{
+	if( NULL != mData ) free( mData );
+	mData = NULL;
+}
+
+void SP_XmlPIEvent :: setTarget( const char * target )
+{
+	snprintf( mTarget, sizeof( mTarget ), "%s", target );
+}
+
+const char * SP_XmlPIEvent :: getTarget()
+{
+	return mTarget;
+}
+
+void SP_XmlPIEvent :: setData( const char * data, int len )
+{
+	if( NULL != data ) {
+		if( NULL != mData ) free( mData );
+		mData = (char*)malloc( len + 1 );
+		memcpy( mData, data, len );
+		mData[ len ] = '\0';
+	}
+}
+
+const char * SP_XmlPIEvent :: getData()
+{
+	return mData;
+}
+
+//=========================================================
+
 SP_XmlDocDeclEvent :: SP_XmlDocDeclEvent()
 	: SP_XmlPullEvent( eDocDecl )
 {
