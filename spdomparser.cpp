@@ -45,13 +45,17 @@ const char * SP_XmlDomParser :: getEncoding()
 	return mParser->getEncoding();
 }
 
-void SP_XmlDomParser :: append( const char * source, int len )
+int SP_XmlDomParser :: append( const char * source, int len )
 {
+	int ret = 0;
+
 	for( int pos = 0; pos < len; pos += 64 ) {
 		int realLen = ( len - pos ) > 64 ? 64 : ( len - pos );
-		mParser->append( source + pos, realLen );
+		ret += mParser->append( source + pos, realLen );
 		buildTree();
 	}
+
+	return ret;
 }
 
 void SP_XmlDomParser :: buildTree()

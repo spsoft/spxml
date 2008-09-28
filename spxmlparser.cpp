@@ -61,11 +61,16 @@ const char * SP_XmlPullParser :: getEncoding()
 	return mEncoding;
 }
 
-void SP_XmlPullParser :: append( const char * source, int len )
+int SP_XmlPullParser :: append( const char * source, int len )
 {
-	if( NULL != mError ) return;
+	if( NULL != mError ) return 0;
+
+	int consumed = 0;
 
 	for( int i = 0; i < len && NULL == mError; i++ ) {
+
+		consumed++;
+
 		char c = source[ i ];
 
 		mErrorSegment[ mErrorIndex++ % sizeof( mErrorSegment ) ] = c;
@@ -77,6 +82,8 @@ void SP_XmlPullParser :: append( const char * source, int len )
 			mColIndex++;
 		}
 	}
+
+	return consumed;
 }
 
 SP_XmlPullEvent * SP_XmlPullParser :: getNext()

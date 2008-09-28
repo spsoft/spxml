@@ -21,7 +21,8 @@ public:
 	~SP_XmlDomParser();
 
 	/// append more input xml source
-	void append( const char * source, int len );
+	/// @return how much byte has been consumed
+	int append( const char * source, int len );
 
 	/// @return NOT NULL : the detail error message
 	/// @return NULL : no error
