@@ -18,7 +18,8 @@ public:
 	~SP_XmlPullParser();
 
 	/// append more input xml source
-	void append( const char * source, int len );
+	/// @return how much byte has been consumed
+	int append( const char * source, int len );
 
 	/// @return NOT NULL : the pull event
 	/// @return NULL : error or need more input
