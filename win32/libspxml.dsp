@@ -105,6 +105,10 @@ SOURCE=..\spxmlevent.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\spxmlhandle.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\spxmlnode.cpp
 # End Source File
 # Begin Source File
@@ -146,6 +150,10 @@ SOURCE=..\spxmlcodec.hpp
 # Begin Source File
 
 SOURCE=..\spxmlevent.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\spxmlhandle.hpp
 # End Source File
 # Begin Source File
 

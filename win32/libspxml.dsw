@@ -27,6 +27,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "testhandle"=".\testhandle.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "testpull"=".\testpull.dsp" - Package Owner=<4>
 
 Package=<5>
