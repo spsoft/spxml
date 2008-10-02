@@ -35,7 +35,7 @@ public:
 
 	int getLength() const;
 	void append( SP_XmlNode * node );
-	const SP_XmlNode * get( int index ) const;
+	SP_XmlNode * get( int index ) const;
 	SP_XmlNode * take( int index ) const;
 
 private:
