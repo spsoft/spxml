@@ -67,7 +67,7 @@ void SP_XmlNodeList :: append( SP_XmlNode * node )
 	mList->append( node );
 }
 
-const SP_XmlNode * SP_XmlNodeList :: get( int index ) const
+SP_XmlNode * SP_XmlNodeList :: get( int index ) const
 {
 	return (SP_XmlNode*)mList->getItem( index );
 }
