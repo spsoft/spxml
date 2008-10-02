@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <string.h>
-#include <unistd.h>
 #include <assert.h>
 
 #include "spdomparser.hpp"
@@ -50,6 +49,10 @@ int main( int argc, char * argv[] )
 	}
 
 	printf( "\n" );
+
+#ifdef WIN32
+	getchar();
+#endif
 
 	return 0;
 }
