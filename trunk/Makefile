@@ -20,7 +20,7 @@ endif
 LIBOBJS = spxmlutils.o spxmlevent.o spxmlreader.o spxmlparser.o spxmlstag.o \
 		spxmlnode.o spdomparser.o spdomiterator.o spxmlcodec.o spxmlhandle.o
 
-TARGET =  libspxml.so \
+TARGET =  libspxml.so libspxml.a \
 		testpull testdom testxmlconf testhandle
 
 #--------------------------------------------------------------------
@@ -29,6 +29,9 @@ all: $(TARGET)
 
 libspxml.so: $(LIBOBJS)
 	$(LINKER) $(SOFLAGS) $^ -o $@
+
+libspxml.a: $(LIBOBJS)
+	$(AR) $@ $^
 
 testpull: testpull.o
 	$(LINKER) $(LDFLAGS) $^ -L. -lspxml -o $@
