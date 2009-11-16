@@ -71,7 +71,7 @@ SP_XmlPullEvent * SP_XmlPIReader :: getEvent( SP_XmlPullParser * parser )
 {
 	SP_XmlPullEvent * retEvent = NULL;
 
-	if( mBuffer->getSize() > 0 ) {
+	if( mBuffer->getSize() > 0 && '?' == mBuffer->getBuffer()[ mBuffer->getSize() - 1 ] ) {
 		char * begin = (char*)mBuffer->getBuffer();
 		for( ; isspace( *begin ); ) begin++;
 
@@ -101,6 +101,8 @@ SP_XmlPullEvent * SP_XmlPIReader :: getEvent( SP_XmlPullParser * parser )
 
 			retEvent = piEvent;
 		}
+	} else {
+		setError( parser, "invalid processing instruction" );
 	}
 
 	return retEvent;
@@ -113,8 +115,8 @@ SP_XmlPullEvent * SP_XmlPIReader :: parseDocDeclEvent( SP_XmlPullParser * parser
 
 	SP_XmlSTagParser tagParser( parser->getEncoding() );
 
-	tagParser.append( buffer->getBuffer(), buffer->getSize() );
-	tagParser.append( " ", 1 );
+	tagParser.append( buffer->getBuffer(), buffer->getSize() - 1 );
+	tagParser.append( " ", 2 );
 
 	if( NULL == tagParser.getError() ) {
 		SP_XmlStartTagEvent * event = tagParser.takeEvent();
@@ -186,7 +188,7 @@ SP_XmlPullEvent * SP_XmlStartTagReader :: getEvent( SP_XmlPullParser * parser )
 
 	SP_XmlSTagParser tagParser( parser->getEncoding() );
 	tagParser.append( mBuffer->getBuffer(), mBuffer->getSize() );
-	tagParser.append( " ", 1 );
+	tagParser.append( " ", 2 );
 
 	if( NULL == tagParser.getError() ) {
 		retEvent = tagParser.takeEvent();
