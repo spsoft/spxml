@@ -47,15 +47,21 @@ const char * SP_XmlDomParser :: getEncoding()
 
 int SP_XmlDomParser :: append( const char * source, int len )
 {
-	int ret = 0;
+	int consumed = 0;
 
 	for( int pos = 0; pos < len; pos += 64 ) {
 		int realLen = ( len - pos ) > 64 ? 64 : ( len - pos );
-		ret += mParser->append( source + pos, realLen );
+
+		int ret = mParser->append( source + pos, realLen );
+
 		buildTree();
+
+		if( ret <= 0 ) break;
+
+		consumed += ret;
 	}
 
-	return ret;
+	return consumed;
 }
 
 void SP_XmlDomParser :: buildTree()

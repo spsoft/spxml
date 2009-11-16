@@ -141,6 +141,8 @@ void SP_XmlSTagNameReader :: read( SP_XmlSTagParser * parser, char c )
 			setName( parser, mBuffer->getBuffer() );
 			changeReader( parser, new SP_XmlSTagAttrNameReader() );
 		}
+	} else if( '\0' == c ) {
+		setError( parser, "miss tag name" );
 	} else {
 		mBuffer->append( c );
 	}
@@ -206,12 +208,12 @@ void SP_XmlSTagEqualMarkReader :: read( SP_XmlSTagParser * parser, char c )
 	} else if( '=' == c ) {
 		changeReader( parser, new SP_XmlSTagAttrValueReader() );
 	} else {
-		addAttrValue( parser, "" );
-		SP_XmlSTagReader * reader = new SP_XmlSTagAttrNameReader();
-		changeReader( parser, reader );
-		reader->read( parser, c );
+		//addAttrValue( parser, "" );
+		//SP_XmlSTagReader * reader = new SP_XmlSTagAttrNameReader();
+		//changeReader( parser, reader );
+		//reader->read( parser, c );
 
-		//setError( parser, "miss '=' between name & value" );
+		setError( parser, "miss '=' between name & value" );
 	}
 }
 
