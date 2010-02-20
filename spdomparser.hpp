@@ -58,9 +58,7 @@ public:
 	const char * getBuffer() const;
 	int getSize() const;
 
-private:
-	SP_XmlDomBuffer( SP_XmlDomBuffer & );
-	SP_XmlDomBuffer & operator=( SP_XmlDomBuffer & );
+public:
 
 	static void dumpDocDecl( const char * encoding,
 			const SP_XmlDocDeclNode * docDecl,
@@ -74,6 +72,10 @@ private:
 	static void dumpElement( const char * encoding,
 			const SP_XmlNode * node,
 			SP_XmlStringBuffer * buffer, int level );
+
+private:
+	SP_XmlDomBuffer( SP_XmlDomBuffer & );
+	SP_XmlDomBuffer & operator=( SP_XmlDomBuffer & );
 
 	SP_XmlStringBuffer * mBuffer;
 };
