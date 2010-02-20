@@ -18,10 +18,11 @@ endif
 #--------------------------------------------------------------------
 
 LIBOBJS = spxmlutils.o spxmlevent.o spxmlreader.o spxmlparser.o spxmlstag.o \
-		spxmlnode.o spdomparser.o spdomiterator.o spxmlcodec.o spxmlhandle.o
+		spxmlnode.o spdomparser.o spdomiterator.o spxmlcodec.o spxmlhandle.o \
+		spxmlrpc.o
 
 TARGET =  libspxml.so libspxml.a \
-		testpull testdom testxmlconf testhandle
+		testpull testdom testxmlconf testhandle testrpc
 
 #--------------------------------------------------------------------
 
@@ -43,6 +44,9 @@ testxmlconf: testxmlconf.o spcanonxml.o
 	$(LINKER) $(LDFLAGS) $^ -L. -lspxml -o $@
 
 testhandle: testhandle.o
+	$(LINKER) $(LDFLAGS) $^ -L. -lspxml -o $@
+
+testrpc: testrpc.o
 	$(LINKER) $(LDFLAGS) $^ -L. -lspxml -o $@
 
 dist: clean spxml-$(version).src.tar.gz
